@@ -5,6 +5,19 @@
       <h2 class="code">{{ roomCode }}</h2>
     </div>
 
+    <button
+      (click)="fetchData()"
+      style="
+        padding: 8px 16px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        border-radius: 5px;
+        font-weight: bold;
+      "
+    >
+      ↻ Sync Players
+    </button>
+
     <div class="players-bar">
       <span class="players-count">{{ players.length }} PLAYERS</span>
       <div class="player-chips">
