@@ -53,8 +53,8 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
     }
 
     this.fetchData();
-    // Radar ping every 3 seconds to update player list and room status
-    this.pollingInterval = setInterval(() => this.fetchData(), 3000);
+    // // Radar ping every 3 seconds to update player list and room status
+    // this.pollingInterval = setInterval(() => this.fetchData(), 3000);
   }
 
   ngOnDestroy(): void {
