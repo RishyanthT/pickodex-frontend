@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -112,6 +112,18 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
           }
         },
       });
+  }
+
+  /**
+   * MOBILE FIX: When the host looks back at their phone, 
+   * force a one-time sync to show the green ticks.
+   */
+  @HostListener('document:visibilitychange', [])
+  onVisibilityChange() {
+    if (document.visibilityState === 'visible' && this.roomCode) {
+      console.log('Phone woke up - syncing data...');
+      this.fetchData(); 
+    }
   }
 
   loadTopicItems() {
