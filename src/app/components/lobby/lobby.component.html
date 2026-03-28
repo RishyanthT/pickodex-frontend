@@ -1,0 +1,62 @@
+<div class="lobby-wrapper">
+  <div class="glass-card main-menu">
+    <h1 class="logo">PICKODEX</h1>
+
+    <div class="section identity-section">
+      <p class="input-label">WHO ARE YOU?</p>
+      <div class="input-group">
+        <input
+          type="text"
+          placeholder="NICKNAME"
+          class="glass-input"
+          [(ngModel)]="nickname"
+          maxlength="15"
+        />
+        <input
+          type="password"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          placeholder="SECRET PIN (4 Digits)"
+          class="glass-input"
+          [(ngModel)]="userPin"
+          maxlength="4"
+          (input)="enforcePinFormat($event)"
+        />
+      </div>
+      <p class="help-text">Your PIN lets you rejoin if your tab closes!</p>
+    </div>
+
+    <div class="divider"><span>THEN</span></div>
+
+    <div class="section">
+      <button
+        class="action-btn"
+        (click)="onCreateGame()"
+        [disabled]="isLoading || !nickname || !userPin"
+      >
+        {{ isLoading ? "GENERATING..." : "CREATE NEW LOBBY" }}
+      </button>
+    </div>
+
+    <div class="divider"><span>OR</span></div>
+
+    <div class="section">
+      <p class="input-label">JOIN A FRIEND</p>
+      <input
+        type="text"
+        placeholder="ENTER 6-DIGIT CODE"
+        class="glass-input join-input"
+        [(ngModel)]="joinCode"
+        maxlength="6"
+        (keyup.enter)="onJoinGame()"
+      />
+      <button
+        class="secondary-btn"
+        (click)="onJoinGame()"
+        [disabled]="isLoading || !joinCode || !nickname || !userPin"
+      >
+        JOIN GAME
+      </button>
+    </div>
+  </div>
+</div>

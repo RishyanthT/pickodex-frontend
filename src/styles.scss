@@ -1,1 +1,46 @@
-/* You can add global styles to this file, and also import other style files */
+@use 'styles/colors' as *;
+@use 'styles/breakpoints' as *;
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  background: $bg-gradient;
+  background-attachment: fixed;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: $text-main;
+  overflow-x: hidden;
+}
+
+// The Reusable Glass Container
+.glass-card {
+  background: $glass-white;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid $glass-border;
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  
+  @include mobile {
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+}
+
+// Clean Professional Button
+.action-btn {
+  background: $accent-blue;
+  color: #0f172a;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, filter 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+  }
+}

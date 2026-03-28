@@ -1,0 +1,337 @@
+<div class="lobby-wrapper">
+  <header class="game-header inner-panel">
+    <div class="room-info">
+      <span class="label">ROOM CODE</span>
+      <h2 class="code">{{ roomCode }}</h2>
+    </div>
+
+    <div class="players-bar">
+      <span class="players-count">{{ players.length }} PLAYERS</span>
+      <div class="player-chips">
+        <div
+          class="player-chip"
+          *ngFor="let player of players"
+          [ngClass]="{ ready: player.hasSubmitted, 'is-host': player.host }"
+        >
+          <span class="status-icon">{{
+            player.hasSubmitted ? "✅" : "⏳"
+          }}</span>
+          <span class="name">{{ player.nickname }}</span>
+          <span class="crown" *ngIf="player.host">👑</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="game-stage">
+    <h1 class="title" *ngIf="roomDetails">
+      {{ roomDetails.topic }}
+      <small style="font-size: 0.5em; opacity: 0.6; display: block">{{
+        roomDetails.gameMode
+      }}</small>
+    </h1>
+
+    <div *ngIf="!hasSubmitted; else lockedView" class="fade-in">
+      <p class="input-label" style="text-align: center">
+        {{
+          roomDetails?.gameMode === "FRIENDS_CHOICE"
+            ? "Rank these items to help the group decide:"
+            : "Set your winning predictions:"
+        }}
+      </p>
+
+      <div class="ranking-layout" cdkDropListGroup>
+        <div class="list-container">
+          <p class="list-header">AVAILABLE</p>
+          <div
+            cdkDropList
+            [cdkDropListData]="availableItems"
+            class="drop-list"
+            (cdkDropListDropped)="drop($event)"
+          >
+            <div class="item-card" *ngFor="let item of availableItems" cdkDrag>
+              <div class="drag-handle" cdkDragHandle>
+                <svg width="24px" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M10 9h4V5h-4v4zm0 5h4v-4h-4v4zm0 5h4v-4h-4v4zM4 9h4V5H4v4zm0 5h4v-4H4v4zm0 5h4v-4H4v4zm12-10v4h4V5h-4zm0 10h4v-4h-4v4zm0-5h4v-4h-4v4z"
+                  ></path>
+                </svg>
+              </div>
+              <div class="item-info">{{ item.itemName }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="transfer-icon">⇄</div>
+
+        <div class="list-container">
+          <p class="list-header">YOUR RANKING</p>
+          <div
+            cdkDropList
+            [cdkDropListData]="rankedItems"
+            class="drop-list ranked"
+            (cdkDropListDropped)="drop($event)"
+          >
+            <div
+              class="item-card"
+              *ngFor="let item of rankedItems; let i = index"
+              cdkDrag
+            >
+              <div class="drag-handle" cdkDragHandle>
+                <svg width="24px" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M10 9h4V5h-4v4zm0 5h4v-4h-4v4zm0 5h4v-4h-4v4zM4 9h4V5H4v4zm0 5h4v-4H4v4zm0 5h4v-4H4v4zm12-10v4h4V5h-4zm0 10h4v-4h-4v4zm0-5h4v-4h-4v4z"
+                  ></path>
+                </svg>
+              </div>
+              <div class="item-info">
+                <span class="rank-badge">{{ i + 1 }}</span>
+                <span class="item-name">{{ item.itemName }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 2rem">
+        <button
+          class="glass-button start-btn"
+          [disabled]="rankedItems.length === 0"
+          (click)="onSubmitPredictions()"
+        >
+          LOCK IN PICKS
+        </button>
+      </div>
+    </div>
+
+    <ng-template #lockedView>
+      <div class="locked-status">
+        <div
+          *ngIf="roomDetails?.status === 'WAITING'"
+          class="fade-in"
+          style="text-align: center"
+        >
+          <h2 class="room-code">PICKS SUBMITTED! 🔒</h2>
+          <button
+            class="glass-button secondary-btn edit-btn"
+            (click)="onEditPicks()"
+            style="margin-top: 15px; border-color: #ffd700"
+          >
+            ✏️ EDIT MY PICKS
+          </button>
+
+          <div
+            *ngIf="isLocalPlayerHost"
+            class="host-controls"
+            style="
+              margin-top: 3rem;
+              padding-top: 2rem;
+              border-top: 1px solid rgba(255, 255, 255, 0.1);
+            "
+          >
+            <button
+              class="glass-button"
+              [disabled]="!allPlayersReady"
+              (click)="onLockRoom()"
+            >
+              {{
+                allPlayersReady
+                  ? "LOCK ROOM & SHOW PICKS"
+                  : "WAITING ON PLAYERS..."
+              }}
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="roomDetails?.status === 'LOCKED'" class="fade-in">
+          <div style="text-align: center; margin-bottom: 2rem">
+            <h2 class="room-code">PICKS ARE LOCKED! 🔒</h2>
+            <p class="input-label">Here is how everyone ranked them.</p>
+          </div>
+
+          <div class="spectator-grid">
+            <div
+              class="player-pick-card inner-panel"
+              *ngFor="let player of allPlayerPicks"
+            >
+              <h3 class="card-title">{{ player.nickname }}</h3>
+              <div class="pick-list-simple">
+                <div
+                  class="simple-row"
+                  *ngFor="let team of player.picks; let i = index"
+                >
+                  <span class="tiny-rank">{{ i + 1 }}</span>
+                  <span class="tiny-name">{{ team }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            *ngIf="isLocalPlayerHost"
+            class="host-result-builder fade-in inner-panel"
+            style="margin-top: 3rem; padding: 2rem; text-align: center"
+          >
+            <h3 style="color: #ffd700; margin-bottom: 1rem">
+              👑 HOST CONTROLS
+            </h3>
+
+            <div *ngIf="roomDetails?.gameMode === 'PREDICTION'">
+              <p class="input-label">
+                Drag teams into the <u>OFFICIAL</u> final order:
+              </p>
+              <div
+                cdkDropList
+                [cdkDropListData]="officialItems"
+                (cdkDropListDropped)="drop($event)"
+                class="drop-list official-set"
+              >
+                <div
+                  class="item-card"
+                  *ngFor="let item of officialItems; let i = index"
+                  cdkDrag
+                >
+                  <span class="rank-badge">{{ i + 1 }}</span>
+                  {{ item.itemName }}
+                </div>
+              </div>
+              <button
+                class="glass-button start-btn"
+                (click)="onPostOfficialResults()"
+              >
+                POST OFFICIAL RESULTS
+              </button>
+            </div>
+
+            <div *ngIf="roomDetails?.gameMode === 'FRIENDS_CHOICE'">
+              <p class="input-label" style="margin-bottom: 1.5rem">
+                Ready to see the group's final decision?
+              </p>
+              <button
+                class="glass-button start-btn"
+                (click)="onRevealConsensus()"
+              >
+                REVEAL GROUP CHOICE 🗳️
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          *ngIf="roomDetails?.status === 'REVEALED'"
+          class="leaderboard-container fade-in"
+        >
+          <h1 class="winner-title">
+            {{
+              roomDetails.gameMode === "FRIENDS_CHOICE"
+                ? "📊 THE GROUP DECISION"
+                : "🏆 FINAL STANDINGS"
+            }}
+          </h1>
+
+          <div class="podium-list inner-panel">
+            <div class="score-row" *ngFor="let entry of results; let i = index">
+              <div class="rank-pos">
+                <span *ngIf="i === 0">🥇</span><span *ngIf="i === 1">🥈</span
+                ><span *ngIf="i === 2">🥉</span>
+                <span *ngIf="i > 2">#{{ i + 1 }}</span>
+              </div>
+
+              <span class="name">
+                {{
+                  roomDetails.gameMode === "FRIENDS_CHOICE"
+                    ? entry.itemName
+                    : entry.nickname
+                }}
+              </span>
+
+              <span class="points-val">
+                {{
+                  roomDetails.gameMode === "FRIENDS_CHOICE"
+                    ? (entry.averageRank | number: "1.1-1")
+                    : entry.score
+                }}
+                <small>{{
+                  roomDetails.gameMode === "FRIENDS_CHOICE" ? "AVG" : "PTS"
+                }}</small>
+              </span>
+            </div>
+          </div>
+
+          <div
+            *ngIf="roomDetails?.gameMode === 'PREDICTION'"
+            class="breakdown-section"
+          >
+            <h2 class="breakdown-header">📊 HOW THEY SCORED</h2>
+            <div class="breakdown-grid">
+              <div
+                class="player-breakdown-card inner-panel"
+                *ngFor="let entry of results"
+              >
+                <h3 class="player-name-plate">
+                  {{ entry.nickname }} ({{ entry.score }} PTS)
+                </h3>
+                <table class="breakdown-table">
+                  <thead>
+                    <tr>
+                      <th>Team</th>
+                      <th>Pick</th>
+                      <th>Actual</th>
+                      <th>Pts</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="let pick of entry.details"
+                      [ngClass]="{
+                        'perfect-pick': pick.pointsEarned === 6,
+                        'close-pick': pick.pointsEarned === 3,
+                        'ok-pick': pick.pointsEarned === 1,
+                      }"
+                    >
+                      <td class="team-name">{{ pick.itemName }}</td>
+                      <td>#{{ pick.predictedRank }}</td>
+                      <td>#{{ pick.actualRank }}</td>
+                      <td class="pts-cell">+{{ pick.pointsEarned }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div
+            *ngIf="roomDetails?.gameMode === 'FRIENDS_CHOICE'"
+            class="breakdown-section"
+          >
+            <h2 class="breakdown-header">👀 WHO PICKED WHAT?</h2>
+            <div class="spectator-grid">
+              <div
+                class="player-pick-card inner-panel"
+                *ngFor="let player of allPlayerPicks"
+              >
+                <h3 class="card-title">{{ player.nickname }}</h3>
+                <div class="pick-list-simple">
+                  <div
+                    class="simple-row"
+                    *ngFor="let team of player.picks; let i = index"
+                  >
+                    <span class="tiny-rank">{{ i + 1 }}</span>
+                    <span class="tiny-name">{{ team }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button
+            class="glass-button play-again-btn"
+            (click)="router.navigate(['/'])"
+          >
+            NEW GAME
+          </button>
+        </div>
+      </div>
+    </ng-template>
+  </main>
+</div>

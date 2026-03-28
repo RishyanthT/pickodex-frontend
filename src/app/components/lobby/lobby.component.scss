@@ -1,0 +1,132 @@
+@use 'styles/colors' as *;
+
+.lobby-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+.main-menu {
+  padding: 3rem;
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+
+  .logo {
+    letter-spacing: 8px;
+    font-weight: 200;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    color: $text-muted;
+    margin-bottom: 2rem;
+  }
+
+  .section {
+    margin: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
+  }
+
+  .action-btn {
+    width: 100%; // Makes the button stretch nicely across the card
+  }
+
+  .divider {
+    margin: 2rem 0;
+    position: relative;
+    text-align: center;
+    
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      border-top: 1px solid $glass-border;
+      z-index: 1;
+    }
+
+    span {
+      background: transparent;
+      padding: 0 15px;
+      color: $text-muted;
+      position: relative;
+      z-index: 2;
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+    }
+  }
+
+  .room-display {
+    margin-top: 1rem;
+    padding: 1rem;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border: 1px solid $glass-border;
+    
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: $text-muted;
+    }
+
+    span {
+      display: block;
+      font-size: 2.5rem;
+      color: $accent-blue;
+      font-weight: bold;
+      margin-top: 0.5rem;
+      letter-spacing: 4px;
+    }
+  }
+
+  .glass-input {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid $glass-border;
+    border-radius: 8px;
+    color: $text-main;
+    font-size: 1.2rem;
+    text-align: center;
+    letter-spacing: 3px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: $text-muted;
+      letter-spacing: 1px;
+      font-size: 0.9rem;
+    }
+
+    &:focus {
+      border-color: $accent-blue;
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .secondary-btn {
+    background: transparent;
+    color: $text-main;
+    border: 1px solid $accent-blue;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(96, 165, 250, 0.1);
+    }
+  }
+}

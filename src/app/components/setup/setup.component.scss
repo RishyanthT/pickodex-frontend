@@ -1,0 +1,352 @@
+@use "styles/colors" as *;
+
+/* =========================================
+   SETUP COMPONENT STYLES (CLEAN GLASS)
+   ========================================= */
+
+.setup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 85vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.setup-wizard {
+  max-width: 750px;
+  width: 100%;
+  padding: 3rem;
+  background: rgba(0, 0, 0, 0.2); // Matches Lobby's subtle background
+  backdrop-filter: blur(10px);
+  border: 1px solid $glass-border;
+  border-radius: 8px; // Matches Lobby's sharp 8px radius
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* --- Progress Indicator --- */
+.progress-bar {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 2.5rem;
+
+  .dot {
+    width: 35px;
+    height: 4px;
+    background: $glass-border;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+
+    &.active {
+      background: $accent-blue;
+      width: 50px;
+    }
+  }
+}
+
+/* --- Typography --- */
+.title {
+  font-weight: 400;
+  letter-spacing: 4px;
+  margin-bottom: 0.5rem;
+  color: $text-main;
+}
+
+.input-label {
+  color: $text-muted;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.tiny-label {
+  display: block;
+  font-size: 0.75rem;
+  color: $text-muted;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+/* --- Inputs (Exact match to Lobby) --- */
+.input-group {
+  margin-bottom: 1.5rem;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.glass-input {
+  width: 100%;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid $glass-border;
+  border-radius: 8px;
+  color: $text-main;
+  font-size: 1.2rem;
+  text-align: center;
+  letter-spacing: 3px;
+  outline: none;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: $text-muted;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+  }
+
+  &:focus {
+    border-color: $accent-blue;
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+select.glass-input {
+  appearance: none;
+  cursor: pointer;
+  font-size: 1rem;
+  letter-spacing: 1px;
+
+  option {
+    background: #1a1a2e;
+    color: white;
+  }
+
+  optgroup {
+    background: #0f0f19;
+    color: $accent-blue;
+  }
+}
+
+/* --- Mode Cards (Cleaned up) --- */
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.mode-card {
+  padding: 1.5rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid $glass-border;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+
+  .mode-icon {
+    font-size: 2rem;
+    margin-bottom: 0.8rem;
+  }
+  h3 {
+    font-size: 1.1rem;
+    color: $text-main;
+    margin: 0 0 0.5rem 0;
+    font-weight: 400;
+    letter-spacing: 1px;
+  }
+  p {
+    font-size: 0.8rem;
+    color: $text-muted;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $accent-blue;
+    transform: translateY(-4px);
+
+    h3 {
+      color: $accent-blue;
+    }
+  }
+}
+
+/* --- Topic Grid Buttons --- */
+.topic-selection-area {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.topic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 1.5rem;
+}
+
+.topic-btn {
+  background: transparent;
+  border: 1px solid $glass-border;
+  padding: 1rem;
+  color: $text-main;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(96, 165, 250, 0.1); // Matches Lobby hover
+    border-color: $accent-blue;
+  }
+}
+
+/* --- Custom Generator Area --- */
+.custom-generator-area {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  border: 1px dashed $glass-border;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+
+  .custom-inputs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 1rem;
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 8px;
+    width: 100%;
+    box-sizing: border-box;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: $glass-border;
+      border-radius: 4px;
+    }
+  }
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+
+  .index-badge {
+    width: 35px;
+    height: 35px;
+    background: rgba(96, 165, 250, 0.08); /* Subtle blue tint */
+    border: 1px solid $accent-blue; /* Blue border */
+    color: $accent-blue; /* Blue text */
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .item-input {
+    flex-grow: 1;
+    text-align: left; // Override lobby center alignment so list reads normally
+    letter-spacing: normal;
+    font-size: 1rem;
+    padding: 10px 12px;
+  }
+}
+
+/* --- Mini Mode Toggle --- */
+.mini-mode-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 10px;
+  margin-bottom: 20px;
+
+  .toggle-btn {
+    background: transparent;
+    border: 1px solid $glass-border;
+    color: $text-muted;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s ease;
+    font-family: inherit;
+
+    &.active {
+      border-color: $accent-blue;
+      color: $accent-blue;
+      background: rgba(96, 165, 250, 0.1);
+    }
+
+    &:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+}
+
+/* --- Standardized Buttons (Matched to Lobby) --- */
+.glass-button {
+  width: 100%;
+  background: transparent;
+  color: $text-main;
+  border: 1px solid $accent-blue;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+
+  &:hover:not(:disabled) {
+    background: rgba(96, 165, 250, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: $glass-border;
+  }
+
+  &.start-btn {
+    margin-top: 1rem;
+  }
+
+  &.back-btn {
+    border: none;
+    background: transparent;
+    color: $text-muted;
+    padding: 0.6rem 1.2rem;
+    font-weight: normal;
+    margin-top: 1rem;
+
+    &:hover {
+      color: $text-main;
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

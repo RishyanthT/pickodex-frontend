@@ -1,0 +1,172 @@
+<div class="setup-container">
+  <div class="glass-card setup-wizard">
+    <div class="progress-bar">
+      <div class="dot" [class.active]="step >= 1"></div>
+      <div class="dot" [class.active]="step >= 2"></div>
+      <div class="dot" [class.active]="step >= 3"></div>
+    </div>
+
+    <div *ngIf="step === 1" class="fade-in">
+      <h1 class="title">HOST IDENTITY</h1>
+      <p class="input-label">What should your friends call you?</p>
+      <div class="input-group">
+        <input
+          type="text"
+          class="glass-input"
+          [(ngModel)]="nickname"
+          placeholder="Enter your name..."
+          (keyup.enter)="nickname ? (step = 2) : null"
+        />
+      </div>
+      <button
+        class="glass-button start-btn"
+        [disabled]="!nickname"
+        (click)="step = 2"
+      >
+        CONTINUE
+      </button>
+    </div>
+
+    <div *ngIf="step === 2" class="fade-in">
+      <h1 class="title">WELCOME, {{ nickname | uppercase }}!</h1>
+      <p class="input-label">Select the game mode for this session:</p>
+
+      <div class="mode-grid">
+        <div class="mode-card" (click)="selectedMode = 'PREDICTION'; step = 3">
+          <div class="mode-icon">🎯</div>
+          <h3>PREDICTION</h3>
+          <p>Compete on sports or event outcomes. Perfect for league fans.</p>
+        </div>
+
+        <div
+          class="mode-card"
+          (click)="selectedMode = 'FRIENDS_CHOICE'; step = 3"
+        >
+          <div class="mode-icon">🗳️</div>
+          <h3>FRIENDS CHOICE</h3>
+          <p>Rank items and see the group average. Great for movie nights.</p>
+        </div>
+
+        <div class="mode-card" (click)="selectedMode = 'CUSTOM'; step = 3">
+          <div class="mode-icon">🛠️</div>
+          <h3>CUSTOM</h3>
+          <p>Create your own unique prediction or ranking list from scratch.</p>
+        </div>
+      </div>
+
+      <button class="glass-button small back-btn" (click)="step = 1">
+        ← CHANGE NAME
+      </button>
+    </div>
+
+    <div *ngIf="step === 3" class="fade-in">
+      <h1 class="title">
+        {{ selectedMode === "CUSTOM" ? "CREATE YOUR LIST" : "CHOOSE A TOPIC" }}
+      </h1>
+      <p class="input-label">
+        Mode: <strong>{{ selectedMode.replace("_", " ") }}</strong>
+      </p>
+
+      <div class="topic-selection-area">
+        <div class="topic-grid" *ngIf="selectedMode === 'PREDICTION'">
+          <button
+            class="topic-btn"
+            *ngFor="let t of predictionTopics"
+            (click)="createGame(t)"
+          >
+            {{ t }}
+          </button>
+        </div>
+
+        <div class="topic-grid" *ngIf="selectedMode === 'FRIENDS_CHOICE'">
+          <button
+            class="topic-btn"
+            *ngFor="let t of friendsTopics"
+            (click)="createGame(t)"
+          >
+            {{ t }}
+          </button>
+        </div>
+
+        <div class="custom-generator-area" *ngIf="selectedMode === 'CUSTOM'">
+          <div class="input-group">
+            <label class="tiny-label">LIST TOPIC</label>
+            <input
+              type="text"
+              class="glass-input"
+              [(ngModel)]="customTopic"
+              placeholder="e.g., Best Pizza in Town"
+            />
+          </div>
+
+          <div class="input-group" style="margin-top: 1.5rem">
+            <label class="tiny-label">HOW MANY ITEMS? (2-20)</label>
+            <input
+              type="number"
+              class="glass-input small-input"
+              [(ngModel)]="itemCount"
+              (input)="onCountChange()"
+              min="2"
+              max="20"
+            />
+          </div>
+
+          <div class="custom-inputs-grid">
+            <div
+              *ngFor="
+                let item of customInputs;
+                let i = index;
+                trackBy: trackByFn
+              "
+              class="input-row"
+            >
+              <span class="index-badge">{{ i + 1 }}</span>
+              <input
+                class="glass-input item-input"
+                [(ngModel)]="customInputs[i]"
+                [placeholder]="'Item ' + (i + 1)"
+              />
+            </div>
+          </div>
+
+          <p class="input-label" style="margin-top: 2rem">
+            How should this custom list be played?
+          </p>
+          <div class="mini-mode-toggle">
+            <button
+              class="toggle-btn"
+              [class.active]="customPlayMode === 'PREDICTION'"
+              (click)="customPlayMode = 'PREDICTION'"
+            >
+              🎯 PREDICTION
+            </button>
+            <button
+              class="toggle-btn"
+              [class.active]="customPlayMode === 'FRIENDS_CHOICE'"
+              (click)="customPlayMode = 'FRIENDS_CHOICE'"
+            >
+              🗳️ CHOICE
+            </button>
+          </div>
+
+          <button
+            class="glass-button start-btn"
+            [disabled]="!customTopic || customInputs[0] === ''"
+            (click)="createGame('CUSTOM')"
+            style="margin-top: 2rem"
+          >
+            CREATE CUSTOM ROOM 🚀
+          </button>
+        </div>
+      </div>
+
+      <button
+        class="glass-button small back-btn"
+        (click)="step = 2"
+        style="margin-top: 2rem"
+      >
+        ← CHANGE MODE
+      </button>
+    </div>
+  </div>
+</div>
