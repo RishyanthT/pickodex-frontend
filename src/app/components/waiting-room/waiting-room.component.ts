@@ -2,8 +2,13 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { CdkDragDrop, moveItemInArray, transferArrayItem, DragDropModule } from '@angular/cdk/drag-drop';
-import { environment } from '@env/environment'; 
+import {
+  CdkDragDrop,
+  moveItemInArray,
+  transferArrayItem,
+  DragDropModule,
+} from '@angular/cdk/drag-drop';
+import { environment } from '@env/environment';
 
 @Component({
   selector: 'app-waiting-room',
@@ -18,19 +23,34 @@ export class WaitingRoomComponent implements OnInit {
   roomDetails: any = null;
   players: any[] = [];
 
-  availableItems: any[] = []; 
-  rankedItems: any[] = []; 
-  officialItems: any[] = []; 
-  results: any[] = []; 
+  availableItems: any[] = [];
+  rankedItems: any[] = [];
+  officialItems: any[] = [];
+  results: any[] = [];
   itemsLoaded: boolean = false;
   hasSubmitted: boolean = false;
   allPlayerPicks: { nickname: string; picks: string[] }[] = [];
+
+  pollingInterval: any;
 
   constructor(
     private route: ActivatedRoute,
     public router: Router,
     private http: HttpClient,
   ) {}
+
+  // ngOnInit(): void {
+  //   this.roomCode = this.route.snapshot.paramMap.get('code');
+  //   this.localNickname = sessionStorage.getItem('nickname');
+
+  //   if (!this.localNickname) {
+  //     this.router.navigate(['/']);
+  //     return;
+  //   }
+
+  //   this.fetchData();
+  //   // POLLING IS DEAD. We rely on the Wake-Up listener below.
+  // }
 
   ngOnInit(): void {
     this.roomCode = this.route.snapshot.paramMap.get('code');
@@ -42,7 +62,16 @@ export class WaitingRoomComponent implements OnInit {
     }
 
     this.fetchData();
-    // POLLING IS DEAD. We rely on the Wake-Up listener below.
+
+    // THE FIX: Silently checks for updates every 3 seconds
+    this.pollingInterval = setInterval(() => {
+      this.fetchData();
+    }, 3000);
+  }
+
+  ngOnDestroy(): void {
+    // Stops the timer if they leave the page
+    if (this.pollingInterval) clearInterval(this.pollingInterval);
   }
 
   /**
@@ -51,57 +80,76 @@ export class WaitingRoomComponent implements OnInit {
   @HostListener('document:visibilitychange', [])
   onVisibilityChange() {
     if (document.visibilityState === 'visible' && this.roomCode) {
-      this.fetchData(); 
+      this.fetchData();
     }
   }
 
   fetchData() {
     if (!this.roomCode) return;
 
-    this.http.get(`${environment.apiUrl}/api/lobby/${this.roomCode}`).subscribe({
-      next: (room: any) => {
-        this.roomDetails = room;
-        if (this.roomDetails.status === 'LOCKED' && this.allPlayerPicks.length === 0) {
-          this.fetchAllPicks();
-        }
-        if (this.roomDetails.status === 'REVEALED') {
-          this.fetchResults();
-        }
-        if (this.roomDetails?.topic && !this.itemsLoaded) {
-          this.loadTopicItems();
-        }
-      },
-    });
+    this.http
+      .get(`${environment.apiUrl}/api/lobby/${this.roomCode}`)
+      .subscribe({
+        next: (room: any) => {
+          this.roomDetails = room;
+          if (
+            this.roomDetails.status === 'LOCKED' &&
+            this.allPlayerPicks.length === 0
+          ) {
+            this.fetchAllPicks();
+          }
+          if (this.roomDetails.status === 'REVEALED') {
+            this.fetchResults();
+          }
+          if (this.roomDetails?.topic && !this.itemsLoaded) {
+            this.loadTopicItems();
+          }
+        },
+      });
 
-    this.http.get<any[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/players`).subscribe({
-      next: (data) => {
-        this.players = data;
-        const me = this.players.find(
-          (p) => p.nickname?.toLowerCase() === this.localNickname?.toLowerCase(),
-        );
-        if (me && me.hasSubmitted) {
-          this.hasSubmitted = true;
-        }
-      },
-    });
+    this.http
+      .get<any[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/players`)
+      .subscribe({
+        next: (data) => {
+          this.players = data;
+          const me = this.players.find(
+            (p) =>
+              p.nickname?.toLowerCase() === this.localNickname?.toLowerCase(),
+          );
+          if (me && me.hasSubmitted) {
+            this.hasSubmitted = true;
+          }
+        },
+      });
   }
 
   loadTopicItems() {
     if (!this.roomCode) return;
-    this.http.get<string[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/items`).subscribe({
-      next: (items) => {
-        this.availableItems = items.map((name) => ({ itemName: name }));
-        this.officialItems = [...this.availableItems];
-        this.itemsLoaded = true;
-      }
-    });
+    this.http
+      .get<string[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/items`)
+      .subscribe({
+        next: (items) => {
+          this.availableItems = items.map((name) => ({ itemName: name }));
+          this.officialItems = [...this.availableItems];
+          this.itemsLoaded = true;
+        },
+      });
   }
 
   drop(event: CdkDragDrop<any[]>) {
     if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      moveItemInArray(
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex,
+      );
     } else {
-      transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex,
+      );
     }
   }
 
@@ -113,33 +161,47 @@ export class WaitingRoomComponent implements OnInit {
     }
 
     const predictionPayload = this.rankedItems.map((item) => item.itemName);
-    this.http.post(`${environment.apiUrl}/api/lobby/${this.roomCode}/submit?nickname=${this.localNickname}`, predictionPayload).subscribe({
-      next: () => {
-        this.hasSubmitted = true;
-        this.fetchData();
-      },
-      error: (err) => alert('Failed to save picks. Check console.'),
-    });
+    this.http
+      .post(
+        `${environment.apiUrl}/api/lobby/${this.roomCode}/submit?nickname=${this.localNickname}`,
+        predictionPayload,
+      )
+      .subscribe({
+        next: () => {
+          this.hasSubmitted = true;
+          this.fetchData();
+        },
+        error: (err) => alert('Failed to save picks. Check console.'),
+      });
   }
 
   onLockRoom() {
-    this.http.post(`${environment.apiUrl}/api/lobby/${this.roomCode}/lock`, {}).subscribe({
-      next: () => this.fetchData(),
-    });
+    this.http
+      .post(`${environment.apiUrl}/api/lobby/${this.roomCode}/lock`, {})
+      .subscribe({
+        next: () => this.fetchData(),
+      });
   }
 
   onPostOfficialResults() {
     const officialPayload = this.officialItems.map((i) => i.itemName);
-    this.http.post(`${environment.apiUrl}/api/lobby/${this.roomCode}/set-results`, officialPayload).subscribe({
-      next: () => this.fetchData(),
-      error: (err) => alert('Failed to post results'),
-    });
+    this.http
+      .post(
+        `${environment.apiUrl}/api/lobby/${this.roomCode}/set-results`,
+        officialPayload,
+      )
+      .subscribe({
+        next: () => this.fetchData(),
+        error: (err) => alert('Failed to post results'),
+      });
   }
 
   fetchResults() {
-    this.http.get<any[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/results`).subscribe({
-      next: (data) => this.results = data,
-    });
+    this.http
+      .get<any[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/results`)
+      .subscribe({
+        next: (data) => (this.results = data),
+      });
   }
 
   get isLocalPlayerHost(): boolean {
@@ -154,30 +216,42 @@ export class WaitingRoomComponent implements OnInit {
   }
 
   onEditPicks() {
-    this.http.post(`${environment.apiUrl}/api/lobby/${this.roomCode}/unsubmit?nickname=${this.localNickname}`, {}).subscribe({
-      next: () => {
-        this.hasSubmitted = false;
-        this.fetchData();
-      },
-      error: (err) => alert('Error trying to edit picks.'),
-    });
+    this.http
+      .post(
+        `${environment.apiUrl}/api/lobby/${this.roomCode}/unsubmit?nickname=${this.localNickname}`,
+        {},
+      )
+      .subscribe({
+        next: () => {
+          this.hasSubmitted = false;
+          this.fetchData();
+        },
+        error: (err) => alert('Error trying to edit picks.'),
+      });
   }
 
   fetchAllPicks() {
-    this.http.get<any>(`${environment.apiUrl}/api/lobby/${this.roomCode}/all-picks`).subscribe({
-      next: (data) => {
-        this.allPlayerPicks = Object.keys(data).map((key) => ({
-          nickname: key,
-          picks: data[key],
-        }));
-      },
-    });
+    this.http
+      .get<any>(`${environment.apiUrl}/api/lobby/${this.roomCode}/all-picks`)
+      .subscribe({
+        next: (data) => {
+          this.allPlayerPicks = Object.keys(data).map((key) => ({
+            nickname: key,
+            picks: data[key],
+          }));
+        },
+      });
   }
 
   onRevealConsensus() {
-    this.http.post(`${environment.apiUrl}/api/lobby/${this.roomCode}/reveal-consensus`, {}).subscribe({
-      next: () => this.fetchData(),
-      error: (err) => console.error('Reveal failed', err),
-    });
+    this.http
+      .post(
+        `${environment.apiUrl}/api/lobby/${this.roomCode}/reveal-consensus`,
+        {},
+      )
+      .subscribe({
+        next: () => this.fetchData(),
+        error: (err) => console.error('Reveal failed', err),
+      });
   }
 }
