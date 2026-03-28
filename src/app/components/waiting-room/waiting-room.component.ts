@@ -1,14 +1,9 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import {
-  CdkDragDrop,
-  moveItemInArray,
-  transferArrayItem,
-  DragDropModule,
-} from '@angular/cdk/drag-drop';
-import { environment } from '@env/environment'; // THE FIX: Imported environment
+import { CdkDragDrop, moveItemInArray, transferArrayItem, DragDropModule } from '@angular/cdk/drag-drop';
+import { environment } from '@env/environment'; 
 
 @Component({
   selector: 'app-waiting-room',
@@ -17,24 +12,19 @@ import { environment } from '@env/environment'; // THE FIX: Imported environment
   templateUrl: './waiting-room.component.html',
   styleUrls: ['./waiting-room.component.scss'],
 })
-export class WaitingRoomComponent implements OnInit, OnDestroy {
-  // --- Room & Player Info ---
+export class WaitingRoomComponent implements OnInit {
   roomCode: string | null = '';
   localNickname: string | null = '';
   roomDetails: any = null;
   players: any[] = [];
 
-  // --- Game State ---
-  availableItems: any[] = []; // Left list
-  rankedItems: any[] = []; // Right list
-  officialItems: any[] = []; // Host's final ranking list
-  results: any[] = []; // Final scoreboard
+  availableItems: any[] = []; 
+  rankedItems: any[] = []; 
+  officialItems: any[] = []; 
+  results: any[] = []; 
   itemsLoaded: boolean = false;
   hasSubmitted: boolean = false;
   allPlayerPicks: { nickname: string; picks: string[] }[] = [];
-
-  // --- Polling ---
-  pollingInterval: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -46,199 +36,113 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
     this.roomCode = this.route.snapshot.paramMap.get('code');
     this.localNickname = sessionStorage.getItem('nickname');
 
-    // Security: If they somehow landed here without a nickname, send them back to Lobby
     if (!this.localNickname) {
       this.router.navigate(['/']);
       return;
     }
 
     this.fetchData();
-    // // Radar ping every 3 seconds to update player list and room status
-    // this.pollingInterval = setInterval(() => this.fetchData(), 3000);
-  }
-
-  ngOnDestroy(): void {
-    if (this.pollingInterval) clearInterval(this.pollingInterval);
+    // POLLING IS DEAD. We rely on the Wake-Up listener below.
   }
 
   /**
-   * Main data hub: Fetches Room info and Player statuses
-   */
-  fetchData() {
-    if (!this.roomCode) return;
-
-    // 1. Get Room Details (Mode, Topic, Status)
-    this.http
-      .get(`${environment.apiUrl}/api/lobby/${this.roomCode}`) // ENVIRONMENT SWAP
-      .subscribe({
-        next: (room: any) => {
-          this.roomDetails = room;
-
-          if (
-            this.roomDetails.status === 'LOCKED' &&
-            this.allPlayerPicks.length === 0
-          ) {
-            this.fetchAllPicks();
-          }
-
-          // REVEAL TRIGGER: If the room is finished, get the scores and stop polling!
-          if (this.roomDetails.status === 'REVEALED') {
-            this.fetchResults();
-            if (this.pollingInterval) clearInterval(this.pollingInterval);
-          }
-
-          // RECONNECT FIX: If topic is known but teams aren't loaded, fetch them
-          if (this.roomDetails?.topic && !this.itemsLoaded) {
-            this.loadTopicItems();
-          }
-        },
-      });
-
-    // 2. Get Players List & Sync Submission Status
-    this.http
-      .get<any[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/players`) // ENVIRONMENT SWAP
-      .subscribe({
-        next: (data) => {
-          this.players = data;
-
-          // NULL-SAFE FIX: Added '?' to handle players with missing nicknames
-          const me = this.players.find(
-            (p) =>
-              p.nickname?.toLowerCase() === this.localNickname?.toLowerCase(),
-          );
-
-          if (me && me.hasSubmitted) {
-            this.hasSubmitted = true;
-          }
-        },
-      });
-  }
-
-  /**
-   * MOBILE FIX: When the host looks back at their phone, 
-   * force a one-time sync to show the green ticks.
+   * THE FIX: When you look back at your phone, it grabs the green ticks.
    */
   @HostListener('document:visibilitychange', [])
   onVisibilityChange() {
     if (document.visibilityState === 'visible' && this.roomCode) {
-      console.log('Phone woke up - syncing data...');
       this.fetchData(); 
     }
   }
 
-  loadTopicItems() {
-    if (!this.roomCode) return; // Safety check
+  fetchData() {
+    if (!this.roomCode) return;
 
-    this.http
-      .get<string[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/items`) // ENVIRONMENT SWAP
-      .subscribe({
-        next: (items) => {
-          console.log('Items loaded for room:', items);
-          this.availableItems = items.map((name) => ({ itemName: name }));
-          this.officialItems = [...this.availableItems];
+    this.http.get(`${environment.apiUrl}/api/lobby/${this.roomCode}`).subscribe({
+      next: (room: any) => {
+        this.roomDetails = room;
+        if (this.roomDetails.status === 'LOCKED' && this.allPlayerPicks.length === 0) {
+          this.fetchAllPicks();
+        }
+        if (this.roomDetails.status === 'REVEALED') {
+          this.fetchResults();
+        }
+        if (this.roomDetails?.topic && !this.itemsLoaded) {
+          this.loadTopicItems();
+        }
+      },
+    });
 
-          // CRITICAL: Set this to true so fetchData() doesn't call this again
-          this.itemsLoaded = true;
-        },
-        error: (err) => {
-          console.error('Could not load items from the room:', err);
-        },
-      });
+    this.http.get<any[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/players`).subscribe({
+      next: (data) => {
+        this.players = data;
+        const me = this.players.find(
+          (p) => p.nickname?.toLowerCase() === this.localNickname?.toLowerCase(),
+        );
+        if (me && me.hasSubmitted) {
+          this.hasSubmitted = true;
+        }
+      },
+    });
   }
 
-  // --- DRAG AND DROP LOGIC ---
+  loadTopicItems() {
+    if (!this.roomCode) return;
+    this.http.get<string[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/items`).subscribe({
+      next: (items) => {
+        this.availableItems = items.map((name) => ({ itemName: name }));
+        this.officialItems = [...this.availableItems];
+        this.itemsLoaded = true;
+      }
+    });
+  }
+
   drop(event: CdkDragDrop<any[]>) {
     if (event.previousContainer === event.container) {
-      moveItemInArray(
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex,
-      );
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex,
-      );
+      transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
     }
   }
 
-  // --- ACTIONS ---
-
   onSubmitPredictions() {
-    // 1. Basic safety check
     if (!this.roomCode || !this.localNickname) return;
-
-    // 2. THE FIX: Refuse submission if any items are left unranked!
     if (this.availableItems.length > 0) {
       alert('You must rank ALL items before locking in your picks!');
       return;
     }
 
     const predictionPayload = this.rankedItems.map((item) => item.itemName);
-
-    this.http
-      .post(
-        `${environment.apiUrl}/api/lobby/${this.roomCode}/submit?nickname=${this.localNickname}`, // ENVIRONMENT SWAP
-        predictionPayload,
-      )
-      .subscribe({
-        next: () => {
-          this.hasSubmitted = true;
-          this.fetchData();
-        },
-        error: (err) => {
-          console.error('Submission error:', err);
-          alert('Failed to save picks. Check console.');
-        },
-      });
+    this.http.post(`${environment.apiUrl}/api/lobby/${this.roomCode}/submit?nickname=${this.localNickname}`, predictionPayload).subscribe({
+      next: () => {
+        this.hasSubmitted = true;
+        this.fetchData();
+      },
+      error: (err) => alert('Failed to save picks. Check console.'),
+    });
   }
 
   onLockRoom() {
-    this.http
-      .post(`${environment.apiUrl}/api/lobby/${this.roomCode}/lock`, {})
-      .subscribe({
-        next: () => {
-          console.log('Room Locked By Host');
-          // THE FIX: Tell the frontend to immediately grab the new LOCKED status!
-          this.fetchData();
-        },
-      });
+    this.http.post(`${environment.apiUrl}/api/lobby/${this.roomCode}/lock`, {}).subscribe({
+      next: () => this.fetchData(),
+    });
   }
 
   onPostOfficialResults() {
     const officialPayload = this.officialItems.map((i) => i.itemName);
-
-    this.http
-      .post(
-        `${environment.apiUrl}/api/lobby/${this.roomCode}/set-results`,
-        officialPayload,
-      )
-      .subscribe({
-        next: () => {
-          console.log('Results posted successfully!');
-          // THE FIX: Fetch the updated state instantly
-          this.fetchData();
-        },
-        error: (err) => alert('Failed to post results'),
-      });
+    this.http.post(`${environment.apiUrl}/api/lobby/${this.roomCode}/set-results`, officialPayload).subscribe({
+      next: () => this.fetchData(),
+      error: (err) => alert('Failed to post results'),
+    });
   }
 
   fetchResults() {
-    this.http
-      .get<any[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/results`) // ENVIRONMENT SWAP
-      .subscribe({
-        next: (data) => {
-          this.results = data;
-        },
-      });
+    this.http.get<any[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/results`).subscribe({
+      next: (data) => this.results = data,
+    });
   }
 
-  // --- GETTERS FOR UI ---
-
   get isLocalPlayerHost(): boolean {
-    // NULL-SAFE FIX: Added '?' here as well
     const me = this.players.find(
       (p) => p.nickname?.toLowerCase() === this.localNickname?.toLowerCase(),
     );
@@ -250,50 +154,30 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
   }
 
   onEditPicks() {
-    this.http
-      .post(
-        `${environment.apiUrl}/api/lobby/${this.roomCode}/unsubmit?nickname=${this.localNickname}`, // ENVIRONMENT SWAP
-        {},
-      )
-      .subscribe({
-        next: () => {
-          this.hasSubmitted = false;
-          this.fetchData(); // Instantly update the radar so the Host knows you aren't ready!
-        },
-        error: (err) => {
-          console.error('Could not edit picks', err);
-          alert('Error trying to edit picks.');
-        },
-      });
+    this.http.post(`${environment.apiUrl}/api/lobby/${this.roomCode}/unsubmit?nickname=${this.localNickname}`, {}).subscribe({
+      next: () => {
+        this.hasSubmitted = false;
+        this.fetchData();
+      },
+      error: (err) => alert('Error trying to edit picks.'),
+    });
   }
 
   fetchAllPicks() {
-    this.http
-      .get<any>(`${environment.apiUrl}/api/lobby/${this.roomCode}/all-picks`) // ENVIRONMENT SWAP
-      .subscribe({
-        next: (data) => {
-          // Convert the Java Map {"Rishy": ["CSK", "MI"]} into an Angular Array
-          this.allPlayerPicks = Object.keys(data).map((key) => ({
-            nickname: key,
-            picks: data[key],
-          }));
-        },
-      });
+    this.http.get<any>(`${environment.apiUrl}/api/lobby/${this.roomCode}/all-picks`).subscribe({
+      next: (data) => {
+        this.allPlayerPicks = Object.keys(data).map((key) => ({
+          nickname: key,
+          picks: data[key],
+        }));
+      },
+    });
   }
 
   onRevealConsensus() {
-    this.http
-      .post(
-        `${environment.apiUrl}/api/lobby/${this.roomCode}/reveal-consensus`,
-        {},
-      )
-      .subscribe({
-        next: () => {
-          console.log('Democracy has spoken!');
-          // THE FIX: This will grab the 'REVEALED' status and trigger fetchResults()
-          this.fetchData();
-        },
-        error: (err) => console.error('Reveal failed', err),
-      });
+    this.http.post(`${environment.apiUrl}/api/lobby/${this.roomCode}/reveal-consensus`, {}).subscribe({
+      next: () => this.fetchData(),
+      error: (err) => console.error('Reveal failed', err),
+    });
   }
 }
