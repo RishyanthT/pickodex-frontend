@@ -185,26 +185,29 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
 
   onLockRoom() {
     this.http
-      .post(`${environment.apiUrl}/api/lobby/${this.roomCode}/lock`, {}) // ENVIRONMENT SWAP
+      .post(`${environment.apiUrl}/api/lobby/${this.roomCode}/lock`, {})
       .subscribe({
         next: () => {
           console.log('Room Locked By Host');
+          // THE FIX: Tell the frontend to immediately grab the new LOCKED status!
+          this.fetchData();
         },
       });
   }
 
   onPostOfficialResults() {
-    // Send the officialItems array (which the host just ordered) to the backend
     const officialPayload = this.officialItems.map((i) => i.itemName);
 
     this.http
       .post(
-        `${environment.apiUrl}/api/lobby/${this.roomCode}/set-results`, // ENVIRONMENT SWAP
+        `${environment.apiUrl}/api/lobby/${this.roomCode}/set-results`,
         officialPayload,
       )
       .subscribe({
         next: () => {
           console.log('Results posted successfully!');
+          // THE FIX: Fetch the updated state instantly
+          this.fetchData();
         },
         error: (err) => alert('Failed to post results'),
       });
@@ -269,11 +272,15 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
   onRevealConsensus() {
     this.http
       .post(
-        `${environment.apiUrl}/api/lobby/${this.roomCode}/reveal-consensus`, // ENVIRONMENT SWAP
+        `${environment.apiUrl}/api/lobby/${this.roomCode}/reveal-consensus`,
         {},
       )
       .subscribe({
-        next: () => console.log('Democracy has spoken!'),
+        next: () => {
+          console.log('Democracy has spoken!');
+          // THE FIX: This will grab the 'REVEALED' status and trigger fetchResults()
+          this.fetchData();
+        },
         error: (err) => console.error('Reveal failed', err),
       });
   }

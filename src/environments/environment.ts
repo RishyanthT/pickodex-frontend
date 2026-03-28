@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://pickodex-api.onrender.com'
+  apiUrl: 'https://picko-boot.onrender.com'
 };
