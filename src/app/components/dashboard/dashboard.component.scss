@@ -1,0 +1,201 @@
+@use "styles/colors" as *;
+
+.lobby-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+.main-menu {
+  padding: 3rem;
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+
+  .logo {
+    letter-spacing: 8px;
+    font-weight: 200;
+    margin-bottom: 0.5rem;
+  }
+
+  .section {
+    margin: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
+  }
+
+  .action-btn {
+    width: 100%;
+  }
+
+  .divider {
+    margin: 2rem 0;
+    position: relative;
+    text-align: center;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      border-top: 1px solid $glass-border;
+      z-index: 1;
+    }
+
+    span {
+      background: #0f172a; // Match your background color here if needed
+      padding: 0 15px;
+      color: $text-muted;
+      position: relative;
+      z-index: 2;
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+    }
+  }
+
+  .glass-input {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid $glass-border;
+    border-radius: 8px;
+    color: $text-main;
+    font-size: 1.2rem;
+    text-align: center;
+    letter-spacing: 3px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: $text-muted;
+      letter-spacing: 1px;
+      font-size: 0.9rem;
+    }
+
+    &:focus {
+      border-color: $accent-blue;
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .secondary-btn {
+    background: transparent;
+    color: $text-main;
+    border: 1px solid $accent-blue;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(96, 165, 250, 0.1);
+    }
+  }
+
+  // --- THE NEW ACTIVE ROOMS CSS ---
+  .active-rooms-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-height: 250px; // Adds a max height so the card doesn't stretch off the screen
+    overflow-y: auto; // Makes the list scrollable
+    padding-right: 5px;
+
+    /* Custom scrollbar */
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 5px;
+    }
+
+    .room-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid $glass-border;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .room-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        flex-grow: 1;
+        cursor: pointer;
+
+        .room-topic {
+          font-weight: bold;
+          color: $text-main;
+          font-size: 1.1rem;
+        }
+
+        .room-code {
+          font-size: 0.8rem;
+          color: $text-muted;
+          letter-spacing: 2px;
+          margin-top: 4px;
+        }
+      }
+
+      .room-actions {
+        display: flex;
+        gap: 8px;
+
+        .action-icon {
+          background: rgba(0, 0, 0, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: white;
+          width: 36px;
+          height: 36px;
+          border-radius: 6px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.1rem;
+          transition: all 0.2s;
+
+          &:hover {
+            transform: scale(1.05);
+          }
+        }
+
+        .leave-btn {
+          color: #f87171; // Red X
+          &:hover {
+            background: rgba(248, 113, 113, 0.2);
+            border-color: #f87171;
+          }
+        }
+
+        .join-btn {
+          color: #60a5fa; // Blue Arrow
+          &:hover {
+            background: rgba(96, 165, 250, 0.2);
+            border-color: #60a5fa;
+          }
+        }
+      }
+    }
+  }
+}

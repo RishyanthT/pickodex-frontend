@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core'; // <-- Added OnDestroy here
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -17,7 +17,8 @@ import { environment } from '@env/environment';
   templateUrl: './waiting-room.component.html',
   styleUrls: ['./waiting-room.component.scss'],
 })
-export class WaitingRoomComponent implements OnInit {
+export class WaitingRoomComponent implements OnInit, OnDestroy {
+  // <-- Added OnDestroy here
   roomCode: string | null = '';
   localNickname: string | null = '';
   roomDetails: any = null;
@@ -30,6 +31,7 @@ export class WaitingRoomComponent implements OnInit {
   itemsLoaded: boolean = false;
   hasSubmitted: boolean = false;
   allPlayerPicks: { nickname: string; picks: string[] }[] = [];
+  isCopied: boolean = false;
 
   pollingInterval: any;
 
@@ -39,22 +41,11 @@ export class WaitingRoomComponent implements OnInit {
     private http: HttpClient,
   ) {}
 
-  // ngOnInit(): void {
-  //   this.roomCode = this.route.snapshot.paramMap.get('code');
-  //   this.localNickname = sessionStorage.getItem('nickname');
-
-  //   if (!this.localNickname) {
-  //     this.router.navigate(['/']);
-  //     return;
-  //   }
-
-  //   this.fetchData();
-  //   // POLLING IS DEAD. We rely on the Wake-Up listener below.
-  // }
-
   ngOnInit(): void {
     this.roomCode = this.route.snapshot.paramMap.get('code');
-    this.localNickname = sessionStorage.getItem('nickname');
+
+    // THE FIX: Must be localStorage for Beta 1.1!
+    this.localNickname = localStorage.getItem('nickname');
 
     if (!this.localNickname) {
       this.router.navigate(['/']);
@@ -63,7 +54,7 @@ export class WaitingRoomComponent implements OnInit {
 
     this.fetchData();
 
-    // THE FIX: Silently checks for updates every 3 seconds
+    // The Polling Interval
     this.pollingInterval = setInterval(() => {
       this.fetchData();
     }, 3000);
@@ -124,16 +115,58 @@ export class WaitingRoomComponent implements OnInit {
   }
 
   loadTopicItems() {
-    if (!this.roomCode) return;
+    if (!this.roomCode || !this.localNickname) return;
+
+    // 1. Get ALL items for the room
     this.http
       .get<string[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/items`)
       .subscribe({
-        next: (items) => {
-          this.availableItems = items.map((name) => ({ itemName: name }));
-          this.officialItems = [...this.availableItems];
-          this.itemsLoaded = true;
+        next: (allItems) => {
+          // 2. Now get MY specific saved picks
+          this.http
+            .get<
+              string[]
+            >(`${environment.apiUrl}/api/lobby/${this.roomCode}/picks/${this.localNickname}`)
+            .subscribe({
+              next: (myPicks) => {
+                if (myPicks && myPicks.length > 0) {
+                  // Move saved picks to the right side
+                  this.rankedItems = myPicks.map((name) => ({
+                    itemName: name,
+                  }));
+
+                  // The left side should only show items NOT in my picks
+                  this.availableItems = allItems
+                    .filter((name) => !myPicks.includes(name))
+                    .map((name) => ({ itemName: name }));
+                } else {
+                  // No saved picks? Everything starts on the left
+                  this.availableItems = allItems.map((name) => ({
+                    itemName: name,
+                  }));
+                  this.rankedItems = [];
+                }
+                this.itemsLoaded = true;
+              },
+            });
         },
       });
+  }
+
+  // --- NEW: Copy to Clipboard Logic ---
+  copyRoomCode() {
+    if (this.roomCode) {
+      navigator.clipboard.writeText(this.roomCode).then(() => {
+        this.isCopied = true;
+        // Turns back to the clipboard icon after 2 seconds
+        setTimeout(() => (this.isCopied = false), 2000);
+      });
+    }
+  }
+
+  // --- NEW: Back to Dashboard ---
+  goToDashboard() {
+    this.router.navigate(['/dashboard']);
   }
 
   drop(event: CdkDragDrop<any[]>) {

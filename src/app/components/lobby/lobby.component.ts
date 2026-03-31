@@ -1,9 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { environment } from '@env/environment';
 
 @Component({
   selector: 'app-lobby',
@@ -12,28 +10,40 @@ import { environment } from '@env/environment';
   templateUrl: './lobby.component.html',
   styleUrls: ['./lobby.component.scss'],
 })
-export class LobbyComponent {
-  // --- Form Variables ---
+export class LobbyComponent implements OnInit {
   nickname: string = '';
-  joinCode: string = '';
-  userPin: string = ''; // New variable for the secret code
-  isLoading: boolean = false;
+  userPin: string = '';
 
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-  ) {}
+  constructor(private router: Router) {}
 
-  /**
-   * For the Host: Save identity and go to the Setup Wizard
-   */
+  ngOnInit() {
+    // 1. Check for new permanent storage
+    let savedNickname = localStorage.getItem('nickname');
+    let savedPin = localStorage.getItem('userPin');
+
+    // 2. The Rescue Mission: Check if they are a legacy Beta 1.0 player
+    if (!savedNickname || !savedPin) {
+      savedNickname = sessionStorage.getItem('nickname');
+      savedPin = sessionStorage.getItem('userPin');
+
+      // If we found legacy data, upgrade it to permanent storage invisibly!
+      if (savedNickname && savedPin) {
+        localStorage.setItem('nickname', savedNickname);
+        localStorage.setItem('userPin', savedPin);
+      }
+    }
+
+    // 3. If we know who they are, skip this screen completely!
+    if (savedNickname && savedPin) {
+      this.router.navigate(['/dashboard']);
+    }
+  }
 
   enforcePinFormat(event: any) {
-    // Replaces any non-digit character with nothing, and limits to 4 characters
     this.userPin = event.target.value.replace(/\D/g, '').substring(0, 4);
   }
 
-  onCreateGame() {
+  onLogin() {
     if (!this.nickname || !this.userPin) {
       alert('Please enter a Nickname and a Secret PIN to start!');
       return;
@@ -44,55 +54,11 @@ export class LobbyComponent {
       return;
     }
 
-    // Save identity so the Setup and Waiting Room know who the host is
-    sessionStorage.setItem('nickname', this.nickname);
-    sessionStorage.setItem('userPin', this.userPin);
+    // Save permanently for Beta 1.1
+    localStorage.setItem('nickname', this.nickname);
+    localStorage.setItem('userPin', this.userPin);
 
-    this.router.navigate(['/setup']);
-  }
-
-  /**
-   * For the Guest: Validate PIN and Room Code with the Backend
-   */
-  onJoinGame() {
-    if (!this.nickname || !this.joinCode || !this.userPin) {
-      alert('Enter your Nickname, Room Code, AND your Secret PIN!');
-      return;
-    }
-
-    if (!/^\d{4}$/.test(this.userPin)) {
-      alert('Your Secret PIN must be exactly 4 numbers!');
-      return;
-    }
-
-    this.isLoading = true;
-
-    // THE ENVIRONMENT FIX: Swapped out localhost for the environment variable here!
-    const url = `${environment.apiUrl}/api/lobby/join/${this.joinCode.toUpperCase()}`;
-
-    // THE FIX: Send the data as a JSON Body so the backend's @RequestBody can read it!
-    const payload = {
-      nickname: this.nickname,
-      pin: this.userPin,
-    };
-
-    this.http.post<any>(url, payload).subscribe({
-      next: (room) => {
-        this.isLoading = false;
-
-        sessionStorage.setItem('nickname', this.nickname);
-        sessionStorage.setItem('userPin', this.userPin);
-
-        this.router.navigate(['/waiting-room', room.roomCode]);
-      },
-      error: (err) => {
-        this.isLoading = false;
-        if (err.status === 401) {
-          alert(err.error || 'Incorrect PIN for this nickname!');
-        } else {
-          alert('Room not found or server is down.');
-        }
-      },
-    });
+    // Send them to the new Hub
+    this.router.navigate(['/dashboard']);
   }
 }
