@@ -11,6 +11,7 @@
           class="glass-input"
           [(ngModel)]="nickname"
           maxlength="15"
+          (keyup.enter)="onLogin()"
         />
         <input
           type="password"
@@ -21,41 +22,19 @@
           [(ngModel)]="userPin"
           maxlength="4"
           (input)="enforcePinFormat($event)"
+          (keyup.enter)="onLogin()"
         />
       </div>
-      <p class="help-text">Your PIN lets you rejoin if your tab closes!</p>
+      <p class="help-text">Your PIN acts as your password to rejoin games!</p>
     </div>
-
-    <div class="divider"><span>THEN</span></div>
 
     <div class="section">
       <button
         class="action-btn"
-        (click)="onCreateGame()"
-        [disabled]="isLoading || !nickname || !userPin"
+        (click)="onLogin()"
+        [disabled]="!nickname || userPin.length !== 4"
       >
-        {{ isLoading ? "GENERATING..." : "CREATE NEW LOBBY" }}
-      </button>
-    </div>
-
-    <div class="divider"><span>OR</span></div>
-
-    <div class="section">
-      <p class="input-label">JOIN A FRIEND</p>
-      <input
-        type="text"
-        placeholder="ENTER 6-DIGIT CODE"
-        class="glass-input join-input"
-        [(ngModel)]="joinCode"
-        maxlength="6"
-        (keyup.enter)="onJoinGame()"
-      />
-      <button
-        class="secondary-btn"
-        (click)="onJoinGame()"
-        [disabled]="isLoading || !joinCode || !nickname || !userPin"
-      >
-        JOIN GAME
+        ENTER
       </button>
     </div>
   </div>

@@ -45,7 +45,8 @@ export class SetupComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const savedName = sessionStorage.getItem('nickname');
+    // THE FIX: Switch to localStorage
+    const savedName = localStorage.getItem('nickname');
     if (savedName) {
       this.nickname = savedName;
     } else {
@@ -68,11 +69,16 @@ export class SetupComponent implements OnInit {
   }
 
   createGame(topic: string): void {
-    const pin = sessionStorage.getItem('userPin');
+    // THE FIX: Switch to localStorage
+    const pin = localStorage.getItem('userPin');
+
     if (!this.nickname || !pin) {
       alert('Session expired. Please restart from the lobby.');
       return;
     }
+
+    // If the host clicked "Change Name" in Step 1, save the new name permanently!
+    localStorage.setItem('nickname', this.nickname);
 
     // Determine if we are in the custom flow
     const isCustom = topic === 'CUSTOM';
@@ -88,7 +94,6 @@ export class SetupComponent implements OnInit {
         : [],
     };
 
-    // THE FIX: Swapped out localhost for the environment variable here!
     this.http
       .post(`${environment.apiUrl}/api/lobby/create`, payload)
       .subscribe({

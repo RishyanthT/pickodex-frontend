@@ -10,13 +10,74 @@
   box-sizing: border-box;
 }
 
+/* --- NEW: DASHBOARD & COPY HEADER --- */
+.waiting-room-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+
+  .back-btn {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(-2px);
+    }
+  }
+
+  .room-code-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: 3px;
+      color: #4ade80;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        transform: scale(1.15);
+        color: #60a5fa;
+      }
+    }
+  }
+}
+
 /* Elegant Frosted Glass Panel */
 .inner-panel {
   background: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
   border: 1px solid $glass-border;
-  border-radius: 8px; /* Sharper 8px corners like Lobby */
-  /* Shadows removed for clean flat look */
+  border-radius: 8px;
 }
 
 .game-header {
@@ -58,10 +119,10 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    width: 100%; /* Forces the players bar to take full width now that the room code is gone */
 
     @media (max-width: 768px) {
       align-items: flex-start;
-      width: 100%;
     }
 
     .players-count {
@@ -98,13 +159,13 @@
   transition: all 0.3s ease;
 
   &.ready {
-    border-color: #4ade80; /* Clean flat green */
+    border-color: #4ade80;
     color: #4ade80;
     background: rgba(74, 222, 128, 0.05);
   }
 
   &.is-host {
-    border-color: #fbbf24; /* Clean flat gold */
+    border-color: #fbbf24;
   }
 
   .status-icon {
@@ -224,9 +285,9 @@
   }
 
   .rank-badge {
-    background: rgba(96, 165, 250, 0.08); /* Subtle blue tint */
-    border: 1px solid $accent-blue; /* Blue border */
-    color: $accent-blue; /* Blue text */
+    background: rgba(96, 165, 250, 0.08);
+    border: 1px solid $accent-blue;
+    color: $accent-blue;
     width: 28px;
     height: 28px;
     display: flex;
@@ -271,7 +332,7 @@
 .official-set {
   max-width: 400px;
   margin: 1.5rem auto;
-  border-color: #fbbf24; /* Clean gold border */
+  border-color: #fbbf24;
 }
 
 /* ========================================= */
@@ -297,7 +358,7 @@
 
 .player-pick-card {
   padding: 1rem;
-  border-top: 2px solid $accent-blue; /* Flat accent top border */
+  border-top: 2px solid $accent-blue;
 
   .card-title {
     color: $text-main;
@@ -467,7 +528,6 @@
     text-align: right;
   }
 
-  /* Clean flat colors for points */
   .perfect-pick .pts-cell {
     color: #4ade80;
     font-weight: 600;

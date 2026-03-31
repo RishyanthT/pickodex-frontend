@@ -1,23 +1,22 @@
 <div class="lobby-wrapper">
-  <header class="game-header inner-panel">
-    <div class="room-info">
-      <span class="label">ROOM CODE</span>
-      <h2 class="code">{{ roomCode }}</h2>
+  <div class="waiting-room-header">
+    <button class="glass-button small-btn back-btn" (click)="goToDashboard()">
+      ← DASHBOARD
+    </button>
+
+    <div class="room-code-container">
+      <h2>ROOM: {{ roomCode }}</h2>
+      <button
+        class="copy-btn"
+        (click)="copyRoomCode()"
+        [title]="isCopied ? 'Copied!' : 'Copy Room Code'"
+      >
+        {{ isCopied ? "✓" : "📋" }}
+      </button>
     </div>
+  </div>
 
-    <!-- <button
-      (click)="fetchData()"
-      style="
-        padding: 8px 16px;
-        margin-bottom: 15px;
-        cursor: pointer;
-        border-radius: 5px;
-        font-weight: bold;
-      "
-    >
-      ↻ Sync Players
-    </button> -->
-
+  <header class="game-header inner-panel">
     <div class="players-bar">
       <span class="players-count">{{ players.length }} PLAYERS</span>
       <div class="player-chips">
