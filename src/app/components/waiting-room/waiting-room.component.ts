@@ -115,43 +115,32 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
   }
 
   loadTopicItems() {
-    if (!this.roomCode || !this.localNickname) return;
+  if (!this.roomCode || !this.localNickname) return;
 
-    // 1. Get ALL items for the room
-    this.http
-      .get<string[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/items`)
-      .subscribe({
-        next: (allItems) => {
-          // 2. Now get MY specific saved picks
-          this.http
-            .get<
-              string[]
-            >(`${environment.apiUrl}/api/lobby/${this.roomCode}/picks/${this.localNickname}`)
-            .subscribe({
-              next: (myPicks) => {
-                if (myPicks && myPicks.length > 0) {
-                  // Move saved picks to the right side
-                  this.rankedItems = myPicks.map((name) => ({
-                    itemName: name,
-                  }));
+  this.http.get<string[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/items`).subscribe({
+    next: (allItems) => {
+      
+      // --- THE MISSING LINE: POPULATE THE HOST'S LIST ---
+      this.officialItems = allItems.map(name => ({ itemName: name }));
+      // --------------------------------------------------
 
-                  // The left side should only show items NOT in my picks
-                  this.availableItems = allItems
-                    .filter((name) => !myPicks.includes(name))
-                    .map((name) => ({ itemName: name }));
-                } else {
-                  // No saved picks? Everything starts on the left
-                  this.availableItems = allItems.map((name) => ({
-                    itemName: name,
-                  }));
-                  this.rankedItems = [];
-                }
-                this.itemsLoaded = true;
-              },
-            });
-        },
+      this.http.get<string[]>(`${environment.apiUrl}/api/lobby/${this.roomCode}/picks/${this.localNickname}`).subscribe({
+        next: (myPicks) => {
+          if (myPicks && myPicks.length > 0) {
+            this.rankedItems = myPicks.map(name => ({ itemName: name }));
+            this.availableItems = allItems
+              .filter(name => !myPicks.includes(name))
+              .map(name => ({ itemName: name }));
+          } else {
+            this.availableItems = allItems.map(name => ({ itemName: name }));
+            this.rankedItems = [];
+          }
+          this.itemsLoaded = true;
+        }
       });
-  }
+    }
+  });
+}
 
   // --- NEW: Copy to Clipboard Logic ---
   copyRoomCode() {
