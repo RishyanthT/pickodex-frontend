@@ -1,11 +1,98 @@
 @use "styles/colors" as *;
+@use "styles/breakpoints" as *;
 
 .lobby-wrapper {
   display: flex;
+  min-height: 100vh;
+  width: 100vw;
+}
+
+.hero-section {
+  flex: 1.2;
+  display: flex;
+  align-items: center;
+  padding: 4rem;
+  position: relative;
+
+  @include tablet {
+    display: none;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      linear-gradient(to right, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 100%),
+      url("/home-pic.webp") center/cover no-repeat;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 1) 60%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 1) 60%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    z-index: 0;
+  }
+
+  .hero-content {
+    max-width: 500px;
+    position: relative;
+    z-index: 1;
+
+    h1 {
+      font-size: 4.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 2rem;
+      letter-spacing: -1px;
+      color: $text-main;
+
+      .brand-text {
+        color: $accent-blue;
+      }
+    }
+
+    .rules-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+
+      p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        line-height: 1.4;
+        color: $text-main;
+        margin: 0;
+
+        strong {
+          color: $accent-blue;
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+.auth-section {
+  flex: 1;
+  display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  width: 100vw;
+  padding: 2rem;
+
+  @include tablet {
+    width: 100%;
+    flex: none;
+  }
 }
 
 .main-menu {
@@ -14,10 +101,65 @@
   max-width: 450px;
   text-align: center;
 
-  .logo {
-    letter-spacing: 8px;
-    font-weight: 200;
-    margin-bottom: 0.5rem;
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    .logo {
+      letter-spacing: 6px;
+      font-weight: 200;
+      margin: 0;
+      font-size: 1.5rem;
+      color: $text-main;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .switch-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: $text-main;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    .help-btn {
+      display: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: $text-main;
+      border: 1px solid $glass-border;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+
+      @include tablet {
+        display: flex;
+      }
+    }
+  }
+
+  .welcome-text {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #4ade80;
+    margin: 0;
   }
 
   .section {
@@ -29,8 +171,57 @@
     width: 100%;
   }
 
+  .input-label {
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    color: $text-muted;
+    margin-bottom: -0.5rem;
+    text-transform: uppercase;
+  }
+
   .action-btn {
     width: 100%;
+    background: #60a5fa;
+    color: #0f172a;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition:
+      transform 0.2s,
+      filter 0.2s;
+
+    &:hover {
+      filter: brightness(1.15);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  .secondary-btn {
+    background: transparent;
+    color: $text-main;
+    border: 1px solid $accent-blue;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &:not(:disabled):hover {
+      background: rgba(96, 165, 250, 0.1);
+    }
   }
 
   .divider {
@@ -49,7 +240,7 @@
     }
 
     span {
-      background: #0f172a; // Match your background color here if needed
+      background: #0f172a;
       padding: 0 15px;
       color: $text-muted;
       position: relative;
@@ -85,39 +276,23 @@
     }
   }
 
-  .secondary-btn {
-    background: transparent;
-    color: $text-main;
-    border: 1px solid $accent-blue;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    width: 100%;
-    transition: all 0.2s ease;
-
-    &:hover {
-      background: rgba(96, 165, 250, 0.1);
-    }
-  }
-
-  // --- THE NEW ACTIVE ROOMS CSS ---
   .active-rooms-section {
     display: flex;
     flex-direction: column;
     gap: 12px;
     width: 100%;
-    max-height: 250px; // Adds a max height so the card doesn't stretch off the screen
-    overflow-y: auto; // Makes the list scrollable
-    padding-right: 5px;
+    max-height: 250px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+    box-sizing: border-box;
 
-    /* Custom scrollbar */
     &::-webkit-scrollbar {
-      width: 5px;
+      width: 4px;
     }
     &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
     }
 
     .room-card {
@@ -125,75 +300,142 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      box-sizing: border-box;
-      padding: 12px 16px;
-      background: rgba(255, 255, 255, 0.05);
+      padding: 14px 16px; // Increased padding slightly for better touch target
+      background: rgba(255, 255, 255, 0.04);
       border: 1px solid $glass-border;
       border-radius: 8px;
       transition: all 0.2s ease;
+      box-sizing: border-box;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.07);
+        border-color: rgba(255, 255, 255, 0.2);
       }
 
       .room-info {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        flex-grow: 1;
+        text-align: left;
+        flex: 1;
         cursor: pointer;
+        min-width: 0;
 
         .room-topic {
-          font-weight: bold;
+          font-weight: 600;
           color: $text-main;
           font-size: 1.1rem;
+          margin-bottom: 2px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .room-code {
-          font-size: 0.8rem;
+          font-size: 0.75rem;
           color: $text-muted;
-          letter-spacing: 2px;
-          margin-top: 4px;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
         }
       }
 
       .room-actions {
         display: flex;
-        gap: 8px;
+        gap: 10px;
+        margin-left: 15px; // Keeps a consistent gap from the text
+        flex-shrink: 0;
 
         .action-icon {
-          background: rgba(0, 0, 0, 0.2);
+          background: rgba(255, 255, 255, 0.05);
           border: 1px solid rgba(255, 255, 255, 0.1);
-          color: white;
-          width: 36px;
-          height: 36px;
+          color: $text-main;
+          width: 34px;
+          height: 34px;
           border-radius: 6px;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 1.1rem;
+          font-size: 1rem;
           transition: all 0.2s;
 
           &:hover {
-            transform: scale(1.05);
+            transform: translateY(-1px);
           }
         }
 
         .leave-btn {
-          color: #f87171; // Red X
+          color: #f87171;
           &:hover {
-            background: rgba(248, 113, 113, 0.2);
+            background: rgba(248, 113, 113, 0.15);
             border-color: #f87171;
           }
         }
 
         .join-btn {
-          color: #60a5fa; // Blue Arrow
+          color: #60a5fa;
           &:hover {
-            background: rgba(96, 165, 250, 0.2);
+            background: rgba(96, 165, 250, 0.15);
             border-color: #60a5fa;
           }
+        }
+      }
+    }
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 2rem;
+
+  .modal-content {
+    background: rgba(15, 23, 42, 0.95);
+    padding: 2.5rem;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid $glass-border;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+
+    h2 {
+      color: $text-main;
+      margin-top: 0;
+      margin-bottom: 2rem;
+      font-size: 2.2rem;
+      letter-spacing: -1px;
+
+      .brand-text {
+        color: $accent-blue;
+      }
+    }
+
+    .rules-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+      text-align: left;
+
+      p {
+        color: $text-main;
+        margin: 0;
+        font-size: 1.1rem;
+        line-height: 1.4;
+
+        strong {
+          color: $accent-blue;
+          margin-right: 0.5rem;
         }
       }
     }

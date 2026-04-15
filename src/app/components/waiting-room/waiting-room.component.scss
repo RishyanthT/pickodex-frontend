@@ -8,6 +8,11 @@
   margin: 0 auto;
   padding: 1rem;
   box-sizing: border-box;
+
+  /* FIXED FOR MOBILE AUTO-SCROLL */
+  overflow-y: auto;
+  height: 100vh;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* --- NEW: DASHBOARD & COPY HEADER --- */
@@ -93,33 +98,11 @@
     align-items: flex-start;
   }
 
-  .room-info {
-    display: flex;
-    flex-direction: column;
-
-    .label {
-      font-size: 0.75rem;
-      color: $accent-blue;
-      letter-spacing: 2px;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .code {
-      font-size: 2rem;
-      color: $text-main;
-      margin: 0;
-      line-height: 1.2;
-      letter-spacing: 6px;
-      font-weight: 400;
-    }
-  }
-
   .players-bar {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    width: 100%; /* Forces the players bar to take full width now that the room code is gone */
+    width: 100%;
 
     @media (max-width: 768px) {
       align-items: flex-start;
@@ -223,7 +206,6 @@
   }
 }
 
-/* Flat Drop Zones */
 .drop-list {
   min-height: 400px;
   background: rgba(0, 0, 0, 0.15);
@@ -242,7 +224,6 @@
   }
 }
 
-/* Flat Draggable Items */
 .item-card {
   padding: 0.8rem 1rem;
   background: rgba(255, 255, 255, 0.03);
@@ -256,6 +237,12 @@
   gap: 12px;
   transition: background 0.2s ease;
 
+  /* FIXED FOR MOBILE DRAGGING */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-tap-highlight-color: transparent;
+
   &:hover {
     background: rgba(255, 255, 255, 0.08);
   }
@@ -268,9 +255,6 @@
     cursor: grab;
     display: flex;
     align-items: center;
-    &:active {
-      cursor: grabbing;
-    }
     svg {
       width: 20px;
       height: 20px;
@@ -300,7 +284,9 @@
   }
 }
 
-/* CDK Specific Drag Styles */
+/* ========================================= */
+/* 3. CDK GLOBAL HELPERS                     */
+/* ========================================= */
 .cdk-drag-preview {
   background: #11111a !important;
   border: 1px solid $accent-blue !important;
@@ -310,11 +296,21 @@
   padding: 1rem;
   color: $text-main;
   box-sizing: border-box;
-}
-.cdk-drag-placeholder {
-  opacity: 0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
+.cdk-drag-placeholder {
+  opacity: 0.15;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* ========================================= */
+/* 4. SPECTATOR & DASHBOARD REMAINING        */
+/* ========================================= */
 .transfer-icon {
   font-size: 1.5rem;
   color: $text-muted;
@@ -329,15 +325,6 @@
   }
 }
 
-.official-set {
-  max-width: 400px;
-  margin: 1.5rem auto;
-  border-color: #fbbf24;
-}
-
-/* ========================================= */
-/* 3. SPECTATOR DASHBOARD                    */
-/* ========================================= */
 .spectator-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -384,7 +371,6 @@
     font-size: 0.85rem;
     padding: 6px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-
     .tiny-rank {
       color: $text-muted;
       width: 20px;
@@ -396,9 +382,6 @@
   }
 }
 
-/* ========================================= */
-/* 4. FINAL PODIUM & BREAKDOWN               */
-/* ========================================= */
 .leaderboard-container {
   text-align: center;
   padding: 1rem 0;
@@ -443,18 +426,10 @@
       font-size: 1.1rem;
       color: $text-main;
     }
-
     .points-val {
       font-weight: 600;
       color: $accent-blue;
       font-size: 1.1rem;
-
-      small {
-        font-size: 0.7rem;
-        color: $text-muted;
-        margin-left: 4px;
-        font-weight: normal;
-      }
     }
   }
 }
@@ -462,7 +437,6 @@
 .breakdown-section {
   margin-top: 3rem;
   margin-bottom: 2rem;
-
   .breakdown-header {
     color: $text-muted;
     font-size: 1rem;
@@ -470,7 +444,6 @@
     text-transform: uppercase;
     letter-spacing: 2px;
   }
-
   .breakdown-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -478,7 +451,6 @@
     max-height: 500px;
     overflow-y: auto;
     padding-right: 5px;
-
     &::-webkit-scrollbar {
       width: 4px;
     }
@@ -491,7 +463,6 @@
 
 .player-breakdown-card {
   padding: 1rem;
-
   .player-name-plate {
     color: $text-main;
     margin-bottom: 1rem;
@@ -507,27 +478,23 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
-
   th {
     color: $text-muted;
     text-align: left;
     padding-bottom: 10px;
     font-weight: normal;
   }
-
   td {
     padding: 10px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
     color: $text-muted;
   }
-
   .team-name {
     color: $text-main;
   }
   .pts-cell {
     text-align: right;
   }
-
   .perfect-pick .pts-cell {
     color: #4ade80;
     font-weight: 600;
@@ -540,9 +507,6 @@
   }
 }
 
-/* ========================================= */
-/* 5. STANDARDIZED BUTTONS                   */
-/* ========================================= */
 .glass-button {
   background: transparent;
   color: $text-main;
@@ -558,18 +522,15 @@
   &:hover:not(:disabled) {
     background: rgba(96, 165, 250, 0.1);
   }
-
   &:disabled {
     opacity: 0.3;
     cursor: not-allowed;
     border-color: $glass-border;
   }
-
   &.start-btn {
     width: 100%;
     margin-top: 1rem;
   }
-
   &.edit-btn {
     border-color: #fbbf24;
     color: #fbbf24;
@@ -584,12 +545,9 @@
   width: 100%;
   max-width: 300px;
 }
-
-/* Utils */
 .fade-in {
   animation: fadeIn 0.3s ease;
 }
-
 @keyframes fadeIn {
   from {
     opacity: 0;
