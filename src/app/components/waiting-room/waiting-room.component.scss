@@ -4,23 +4,49 @@
 /* 1. CORE LAYOUT & TOP HEADER               */
 /* ========================================= */
 .lobby-wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
+  /* FIXED: Make wrapper full width so scrollbar is at the screen edge */
+  width: 100%;
+  height: 100vh;
   padding: 1rem;
   box-sizing: border-box;
 
-  /* FIXED FOR MOBILE AUTO-SCROLL */
+  /* FIXED: Scrolling happens on the full-width container */
   overflow-y: auto;
-  height: 100vh;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+
+  /* Stops the layout "skip" when scrollbar appears */
+  scrollbar-gutter: stable;
+
+  /* Custom Scrollbar to match your dark theme */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
 }
 
-/* --- NEW: DASHBOARD & COPY HEADER --- */
+/* New helper to keep content centered at 1200px */
+.waiting-room-header,
+.game-header,
+.game-stage {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
 .waiting-room-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
   margin-bottom: 20px;
 
   .back-btn {
@@ -77,7 +103,6 @@
   }
 }
 
-/* Elegant Frosted Glass Panel */
 .inner-panel {
   background: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
@@ -91,6 +116,7 @@
   align-items: center;
   padding: 1rem 1.5rem;
   margin-bottom: 2rem;
+  box-sizing: border-box;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -128,7 +154,6 @@
   }
 }
 
-/* Clean Player Chips */
 .player-chip {
   display: flex;
   align-items: center;
@@ -150,7 +175,6 @@
   &.is-host {
     border-color: #fbbf24;
   }
-
   .status-icon {
     font-size: 0.9rem;
   }
@@ -196,7 +220,6 @@
 .list-container {
   flex: 1;
   text-align: center;
-
   .list-header {
     font-size: 0.85rem;
     color: $text-muted;
@@ -217,7 +240,6 @@
   @media (max-width: 1000px) {
     min-height: 200px;
   }
-
   &.cdk-drop-list-dragging {
     background: rgba(255, 255, 255, 0.02);
     border-color: $accent-blue;
@@ -236,12 +258,9 @@
   align-items: center;
   gap: 12px;
   transition: background 0.2s ease;
-
-  /* FIXED FOR MOBILE DRAGGING */
   touch-action: none;
   user-select: none;
   -webkit-user-drag: none;
-  -webkit-tap-highlight-color: transparent;
 
   &:hover {
     background: rgba(255, 255, 255, 0.08);
@@ -260,14 +279,12 @@
       height: 20px;
     }
   }
-
   .item-info {
     display: flex;
     align-items: center;
     gap: 12px;
     font-size: 0.95rem;
   }
-
   .rank-badge {
     background: rgba(96, 165, 250, 0.08);
     border: 1px solid $accent-blue;
@@ -303,7 +320,6 @@
   opacity: 0.15;
   background: rgba(255, 255, 255, 0.1) !important;
 }
-
 .cdk-drag-animating {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
@@ -318,7 +334,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-
   @media (max-width: 1000px) {
     transform: rotate(90deg);
     margin: 5px 0;
@@ -333,7 +348,6 @@
   max-height: 500px;
   overflow-y: auto;
   padding-right: 10px;
-
   &::-webkit-scrollbar {
     width: 4px;
   }
@@ -346,7 +360,6 @@
 .player-pick-card {
   padding: 1rem;
   border-top: 2px solid $accent-blue;
-
   .card-title {
     color: $text-main;
     font-size: 1.1rem;
@@ -363,7 +376,6 @@
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-
   .simple-row {
     display: flex;
     align-items: center;
@@ -385,7 +397,6 @@
 .leaderboard-container {
   text-align: center;
   padding: 1rem 0;
-
   .winner-title {
     font-size: 2rem;
     color: $text-main;
@@ -393,12 +404,10 @@
     font-weight: 400;
     letter-spacing: 3px;
   }
-
   .podium-list {
     padding: 1rem;
     margin-bottom: 2rem;
   }
-
   .score-row {
     display: flex;
     justify-content: space-between;
@@ -409,11 +418,9 @@
     background: rgba(255, 255, 255, 0.02);
     margin-bottom: 8px;
     transition: background 0.2s ease;
-
     &:hover {
       background: rgba(255, 255, 255, 0.05);
     }
-
     &:first-child {
       border-color: #fbbf24;
       background: rgba(251, 191, 36, 0.05);
@@ -421,7 +428,6 @@
         color: #fbbf24;
       }
     }
-
     .name {
       font-size: 1.1rem;
       color: $text-main;
@@ -518,7 +524,6 @@
   transition: all 0.2s ease;
   font-family: inherit;
   letter-spacing: 1px;
-
   &:hover:not(:disabled) {
     background: rgba(96, 165, 250, 0.1);
   }
