@@ -1,11 +1,86 @@
 @use "styles/colors" as *;
+@use "styles/breakpoints" as *;
 
 .lobby-wrapper {
   display: flex;
+  min-height: 100vh;
+  width: 100vw;
+}
+
+.hero-section {
+  flex: 1.2;
+  display: flex;
+  align-items: center;
+  padding: 4rem;
+  position: relative;
+
+  @include tablet {
+    display: none;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      linear-gradient(to right, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 100%),
+      url("/home-pic.webp") center/cover no-repeat;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 1) 60%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 1) 60%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    z-index: 0;
+  }
+
+  .hero-content {
+    max-width: 500px;
+    position: relative;
+    z-index: 1;
+
+    h1 {
+      font-size: 4.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      letter-spacing: -1px;
+      color: $text-main;
+
+      .brand-text {
+        color: $accent-blue;
+      }
+    }
+
+    p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      line-height: 1.6;
+      color: $text-main;
+    }
+  }
+}
+
+.auth-section {
+  flex: 1;
+  display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  width: 100vw;
+  padding: 2rem;
+
+  @include tablet {
+    width: 100%;
+    flex: none;
+  }
 }
 
 .main-menu {
@@ -18,6 +93,7 @@
     letter-spacing: 8px;
     font-weight: 200;
     margin-bottom: 0.5rem;
+    color: $text-main;
   }
 
   .section {
@@ -29,7 +105,13 @@
     width: 100%;
   }
 
-  // Added this to stack your Nickname and PIN inputs nicely!
+  .input-label {
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    margin-bottom: -0.5rem;
+    color: $text-muted;
+  }
+
   .input-group {
     display: flex;
     flex-direction: column;
@@ -39,12 +121,37 @@
 
   .action-btn {
     width: 100%;
+    background: #60a5fa;
+    color: #0f172a;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition:
+      transform 0.2s,
+      filter 0.2s;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &:not(:disabled):hover {
+      filter: brightness(1.15);
+    }
+
+    &:not(:disabled):active {
+      transform: scale(0.98);
+    }
   }
 
   .glass-input {
     width: 100%;
     padding: 12px;
-    background: rgba(255, 255, 255, 0.05);
+    background: $glass-white;
     border: 1px solid $glass-border;
     border-radius: 8px;
     color: $text-main;
@@ -65,5 +172,10 @@
       border-color: $accent-blue;
       background: rgba(255, 255, 255, 0.1);
     }
+  }
+
+  .help-text {
+    font-size: 0.8rem;
+    color: $text-muted;
   }
 }

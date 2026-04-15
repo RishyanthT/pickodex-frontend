@@ -17,10 +17,9 @@ export class DashboardComponent implements OnInit {
   userPin: string | null = '';
   joinCode: string = '';
   isLoading: boolean = false;
-
-  // New variables for our Active Rooms list
   activeRooms: any[] = [];
   isLoadingRooms: boolean = true;
+  showRulesModal: boolean = false;
 
   constructor(
     private router: Router,
@@ -34,7 +33,6 @@ export class DashboardComponent implements OnInit {
     if (!this.nickname || !this.userPin) {
       this.router.navigate(['/']);
     } else {
-      // If they are logged in, fetch their games!
       this.fetchActiveRooms();
     }
   }
@@ -48,10 +46,14 @@ export class DashboardComponent implements OnInit {
           this.isLoadingRooms = false;
         },
         error: (err) => {
-          console.error('No active rooms found or backend not ready yet', err);
+          console.error('Error fetching rooms', err);
           this.isLoadingRooms = false;
         },
       });
+  }
+
+  toggleRulesModal() {
+    this.showRulesModal = !this.showRulesModal;
   }
 
   rejoinRoom(roomCode: string) {
@@ -69,8 +71,7 @@ export class DashboardComponent implements OnInit {
   }
 
   onLeaveRoom(roomCode: string, event: Event) {
-    event.stopPropagation(); // Stops the click from triggering the rejoin
-
+    event.stopPropagation();
     if (
       confirm(
         'Are you sure you want to leave this room? Your picks will be deleted.',
@@ -82,7 +83,6 @@ export class DashboardComponent implements OnInit {
         )
         .subscribe({
           next: () => {
-            // Remove it from the screen instantly
             this.activeRooms = this.activeRooms.filter(
               (r) => r.roomCode !== roomCode,
             );
@@ -97,14 +97,9 @@ export class DashboardComponent implements OnInit {
       alert('Please enter a Room Code!');
       return;
     }
-
     this.isLoading = true;
     const url = `${environment.apiUrl}/api/lobby/join/${this.joinCode.toUpperCase()}`;
-    const payload = {
-      nickname: this.nickname,
-      pin: this.userPin,
-    };
-
+    const payload = { nickname: this.nickname, pin: this.userPin };
     this.http.post<any>(url, payload).subscribe({
       next: (room) => {
         this.isLoading = false;
@@ -113,9 +108,9 @@ export class DashboardComponent implements OnInit {
       error: (err) => {
         this.isLoading = false;
         if (err.status === 401) {
-          alert(err.error || 'Incorrect PIN for this nickname in this room!');
+          alert(err.error || 'Incorrect PIN!');
         } else {
-          alert('Room not found or server is down.');
+          alert('Room not found.');
         }
       },
     });

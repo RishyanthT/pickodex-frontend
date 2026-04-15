@@ -1,4 +1,4 @@
-<div class="lobby-wrapper">
+<div class="lobby-wrapper" cdkScrollable>
   <div class="waiting-room-header">
     <button class="glass-button small-btn back-btn" (click)="goToDashboard()">
       ← DASHBOARD
@@ -25,9 +25,9 @@
           *ngFor="let player of players"
           [ngClass]="{ ready: player.hasSubmitted, 'is-host': player.host }"
         >
-          <span class="status-icon">{{
-            player.hasSubmitted ? "✅" : "⏳"
-          }}</span>
+          <span class="status-icon">
+            {{ player.hasSubmitted ? "✅" : "⏳" }}
+          </span>
           <span class="name">{{ player.nickname }}</span>
           <span class="crown" *ngIf="player.host">👑</span>
         </div>
@@ -38,9 +38,9 @@
   <main class="game-stage">
     <h1 class="title" *ngIf="roomDetails">
       {{ roomDetails.topic }}
-      <small style="font-size: 0.5em; opacity: 0.6; display: block">{{
-        roomDetails.gameMode
-      }}</small>
+      <small style="font-size: 0.5em; opacity: 0.6; display: block">
+        {{ roomDetails.gameMode }}
+      </small>
     </h1>
 
     <div *ngIf="!hasSubmitted; else lockedView" class="fade-in">
@@ -58,6 +58,7 @@
           <div
             cdkDropList
             [cdkDropListData]="availableItems"
+            [cdkDropListAutoScrollStep]="15"
             class="drop-list"
             (cdkDropListDropped)="drop($event)"
           >
@@ -81,6 +82,7 @@
           <div
             cdkDropList
             [cdkDropListData]="rankedItems"
+            [cdkDropListAutoScrollStep]="15"
             class="drop-list ranked"
             (cdkDropListDropped)="drop($event)"
           >
@@ -195,6 +197,7 @@
               <div
                 cdkDropList
                 [cdkDropListData]="officialItems"
+                [cdkDropListAutoScrollStep]="15"
                 (cdkDropListDropped)="drop($event)"
                 class="drop-list official-set"
               >
@@ -244,8 +247,9 @@
           <div class="podium-list inner-panel">
             <div class="score-row" *ngFor="let entry of results; let i = index">
               <div class="rank-pos">
-                <span *ngIf="i === 0">🥇</span><span *ngIf="i === 1">🥈</span
-                ><span *ngIf="i === 2">🥉</span>
+                <span *ngIf="i === 0">🥇</span>
+                <span *ngIf="i === 1">🥈</span>
+                <span *ngIf="i === 2">🥉</span>
                 <span *ngIf="i > 2">#{{ i + 1 }}</span>
               </div>
 
@@ -263,9 +267,11 @@
                     ? (entry.averageRank | number: "1.1-1")
                     : entry.score
                 }}
-                <small>{{
-                  roomDetails.gameMode === "FRIENDS_CHOICE" ? "AVG" : "PTS"
-                }}</small>
+                <small>
+                  {{
+                    roomDetails.gameMode === "FRIENDS_CHOICE" ? "AVG" : "PTS"
+                  }}
+                </small>
               </span>
             </div>
           </div>

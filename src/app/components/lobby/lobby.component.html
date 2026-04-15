@@ -1,41 +1,55 @@
 <div class="lobby-wrapper">
-  <div class="glass-card main-menu">
-    <h1 class="logo">PICKODEX</h1>
-
-    <div class="section identity-section">
-      <p class="input-label">WHO ARE YOU?</p>
-      <div class="input-group">
-        <input
-          type="text"
-          placeholder="NICKNAME"
-          class="glass-input"
-          [(ngModel)]="nickname"
-          maxlength="15"
-          (keyup.enter)="onLogin()"
-        />
-        <input
-          type="password"
-          inputmode="numeric"
-          pattern="[0-9]*"
-          placeholder="SECRET PIN (4 Digits)"
-          class="glass-input"
-          [(ngModel)]="userPin"
-          maxlength="4"
-          (input)="enforcePinFormat($event)"
-          (keyup.enter)="onLogin()"
-        />
-      </div>
-      <p class="help-text">Your PIN acts as your password to rejoin games!</p>
+  <div class="hero-section">
+    <div class="hero-content">
+      <h1>
+        Connect.<br />Play.<br /><span class="brand-text">Pickodex.</span>
+      </h1>
+      <p>
+        The ultimate social gaming hub. Enter your credentials to jump into the
+        lobby.
+      </p>
     </div>
+  </div>
 
-    <div class="section">
-      <button
-        class="action-btn"
-        (click)="onLogin()"
-        [disabled]="!nickname || userPin.length !== 4"
-      >
-        ENTER
-      </button>
+  <div class="auth-section">
+    <div class="glass-card main-menu">
+      <h1 class="logo">PICKODEX</h1>
+
+      <div class="section identity-section">
+        <p class="input-label">WHO ARE YOU?</p>
+        <div class="input-group">
+          <input
+            type="text"
+            placeholder="NICKNAME"
+            class="glass-input"
+            [(ngModel)]="nickname"
+            maxlength="15"
+            (keyup.enter)="onLogin()"
+          />
+          <input
+            type="password"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            placeholder="SECRET PIN (4 Digits)"
+            class="glass-input"
+            [(ngModel)]="userPin"
+            maxlength="4"
+            (input)="enforcePinFormat($event)"
+            (keyup.enter)="onLogin()"
+          />
+        </div>
+        <p class="help-text">Your PIN acts as your password to rejoin games!</p>
+      </div>
+
+      <div class="section">
+        <button
+          class="action-btn"
+          (click)="onLogin()"
+          [disabled]="!nickname || userPin.length !== 4"
+        >
+          ENTER
+        </button>
+      </div>
     </div>
   </div>
 </div>

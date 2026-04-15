@@ -1,93 +1,122 @@
 <div class="lobby-wrapper">
-  <div class="glass-card main-menu">
-    <div
-      style="
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-      "
-    >
-      <h1 class="logo" style="margin: 0; font-size: 1.5rem">PICKODEX</h1>
-      <button
-        (click)="onChangeUser()"
-        style="
-          background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          color: white;
-          padding: 5px 10px;
-          border-radius: 5px;
-          cursor: pointer;
-          font-size: 0.8rem;
-        "
+  <div class="hero-section">
+    <div class="hero-content">
+      <h1>How to <span class="brand-text">Play.</span></h1>
+      <div class="rules-container">
+        <p>
+          <strong>🎯 Prediction:</strong> Lock in your team rankings and compete
+          against your friends to see who comes out on top based on our scoring
+          system.
+        </p>
+        <p>
+          <strong>📈 Friend's Choice:</strong> Can't make up your mind on what
+          to do? Put in your choices and just vote. We'll decide it for you.
+        </p>
+        <p>
+          <strong>🛠️ Custom:</strong> Use the both game modes to it's full
+          potential, Make your own rooms with your own choices. Have Fun!
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-section">
+    <div class="glass-card main-menu">
+      <div class="header-row">
+        <h1 class="logo">PICKODEX</h1>
+        <div class="header-actions">
+          <button class="help-btn" (click)="toggleRulesModal()">?</button>
+          <button class="switch-btn" (click)="onChangeUser()">
+            Switch User
+          </button>
+        </div>
+      </div>
+
+      <div class="section identity-section">
+        <p class="welcome-text">Welcome back, {{ nickname }}!</p>
+      </div>
+
+      <div class="section">
+        <button class="action-btn" (click)="onCreateGame()">
+          CREATE NEW LOBBY
+        </button>
+      </div>
+
+      <div class="divider"><span>OR</span></div>
+
+      <div class="section">
+        <p class="input-label">JOIN A FRIEND</p>
+        <input
+          type="text"
+          placeholder="ENTER 6-DIGIT CODE"
+          class="glass-input join-input"
+          [(ngModel)]="joinCode"
+          maxlength="6"
+          (keyup.enter)="onJoinGame()"
+        />
+        <button
+          class="secondary-btn"
+          (click)="onJoinGame()"
+          [disabled]="isLoading || !joinCode"
+        >
+          {{ isLoading ? "JOINING..." : "JOIN GAME" }}
+        </button>
+      </div>
+
+      <div
+        *ngIf="!isLoadingRooms && activeRooms.length > 0"
+        style="width: 100%"
       >
-        Switch User
-      </button>
-    </div>
-
-    <div class="section identity-section">
-      <p
-        class="input-label"
-        style="text-align: center; font-size: 1.2rem; color: #4ade80"
-      >
-        Welcome back, {{ nickname }}!
-      </p>
-    </div>
-
-    <div class="section">
-      <button class="action-btn" (click)="onCreateGame()">
-        CREATE NEW LOBBY
-      </button>
-    </div>
-
-    <div class="divider"><span>OR</span></div>
-
-    <div class="section">
-      <p class="input-label">JOIN A FRIEND</p>
-      <input
-        type="text"
-        placeholder="ENTER 6-DIGIT CODE"
-        class="glass-input join-input"
-        [(ngModel)]="joinCode"
-        maxlength="6"
-        (keyup.enter)="onJoinGame()"
-      />
-      <button
-        class="secondary-btn"
-        (click)="onJoinGame()"
-        [disabled]="isLoading || !joinCode"
-      >
-        {{ isLoading ? "JOINING..." : "JOIN GAME" }}
-      </button>
-    </div>
-    <div *ngIf="!isLoadingRooms && activeRooms.length > 0">
-      <div class="divider"><span>YOUR ACTIVE GAMES</span></div>
-
-      <div class="section active-rooms-section">
-        <div class="room-card" *ngFor="let room of activeRooms">
-          <div class="room-info" (click)="rejoinRoom(room.roomCode)">
-            <span class="room-topic">{{ room.topic || "Custom Game" }}</span>
-            <span class="room-code">Code: {{ room.roomCode }}</span>
-          </div>
-
-          <div class="room-actions">
-            <button
-              class="action-icon leave-btn"
-              (click)="onLeaveRoom(room.roomCode, $event)"
-              title="Leave Room"
-            >
-              ✕
-            </button>
-            <button
-              class="action-icon join-btn"
-              (click)="rejoinRoom(room.roomCode)"
-              title="Rejoin Room"
-            >
-              ➔
-            </button>
+        <div class="divider"><span>YOUR ACTIVE GAMES</span></div>
+        <div class="section active-rooms-section">
+          <div class="room-card" *ngFor="let room of activeRooms">
+            <div class="room-info" (click)="rejoinRoom(room.roomCode)">
+              <span class="room-topic">{{ room.topic || "Custom Game" }}</span>
+              <span class="room-code">Code: {{ room.roomCode }}</span>
+            </div>
+            <div class="room-actions">
+              <button
+                class="action-icon leave-btn"
+                (click)="onLeaveRoom(room.roomCode, $event)"
+              >
+                ✕
+              </button>
+              <button
+                class="action-icon join-btn"
+                (click)="rejoinRoom(room.roomCode)"
+              >
+                ➔
+              </button>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div
+    class="modal-overlay"
+    *ngIf="showRulesModal"
+    (click)="toggleRulesModal()"
+  >
+    <div class="glass-card modal-content" (click)="$event.stopPropagation()">
+      <h2>How to <span class="brand-text">Play.</span></h2>
+      <div class="rules-container">
+        <p>
+          <strong>🎯 Prediction:</strong> Lock in your team rankings and compete
+          against your friends to see who comes out on top based on our scoring
+          system.
+        </p>
+        <p>
+          <strong>📈 Friend's Choice:</strong> Can't make up your mind on what
+          to do? Put in your choices and just vote. We'll decide it for you.
+        </p>
+        <p>
+          <strong>🛠️ Custom:</strong> Use the both game modes to it's full
+          potential, Make your own rooms with your own choices. Have Fun!
+        </p>
+      </div>
+      <button class="action-btn" (click)="toggleRulesModal()">GOT IT</button>
     </div>
   </div>
 </div>
