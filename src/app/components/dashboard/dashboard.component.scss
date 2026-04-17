@@ -5,7 +5,7 @@
   display: flex;
   min-height: 100vh;
   width: 100%;
-  overflow-x: hidden; 
+  overflow-x: hidden;
   box-sizing: border-box;
 }
 
@@ -104,12 +104,12 @@
   width: 100%;
   max-width: 450px;
   text-align: center;
-  max-height: 90vh; 
+  max-height: 90vh;
   overflow-y: auto;
 
-  scrollbar-width: none; 
+  scrollbar-width: none;
   &::-webkit-scrollbar {
-    display: none; 
+    display: none;
   }
 
   .header-row {
@@ -399,7 +399,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%; /* Swapped from 100vw to prevent scrollbar layout jumps */
   height: 100vh;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
@@ -407,7 +407,8 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  padding: 2rem;
+  padding: 1rem; /* Shrunk outer padding so it fits on small phones */
+  box-sizing: border-box; /* <-- ADDED */
 
   .modal-content {
     background: rgba(15, 23, 42, 0.95);
@@ -418,6 +419,12 @@
     border: 1px solid $glass-border;
     text-align: center;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    box-sizing: border-box; /* <-- THE MAIN CULPRIT: ADDED */
+
+    /* Shrinks the inner padding specifically on mobile */
+    @include tablet {
+      padding: 2rem 1.5rem;
+    }
 
     h2 {
       color: $text-main;
