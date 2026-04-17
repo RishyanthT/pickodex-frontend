@@ -4,7 +4,9 @@
 .lobby-wrapper {
   display: flex;
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
+  overflow-x: hidden; 
+  box-sizing: border-box;
 }
 
 .hero-section {
@@ -75,11 +77,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
+  padding: 4rem;
+  box-sizing: border-box;
 
   @include tablet {
     width: 100%;
     flex: none;
+    padding: 1rem;
   }
 }
 
