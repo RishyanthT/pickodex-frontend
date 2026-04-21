@@ -34,5 +34,5 @@ Pickodex is a live, interactive full-stack web application that lets you and you
 * **PostgreSQL (Supabase):** Secure and reliable database for persistent user sessions and room data.
 
 ## 🔗 Links
-* **Live Site:** [Insert Live Link Here]
-* **Backend Repository:** [Insert Backend Repo Link Here]
+* **Live Site: https://pickodex.netlify.app/
+* **Backend Repository:** I would like to not share my backend source code for privacy reasons, but if anyone would like to check it out, contact me.
