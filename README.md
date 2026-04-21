@@ -1,59 +1,38 @@
-# Frontend
+# Pickodex 🎯
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.10.
+Pickodex is a live, interactive full-stack web application that lets you and your friends create custom rooms, rank items, and compete in prediction-style games or make group decisions together. 
 
-## Development server
+> 👋 **Note to Recruiters & Testers:** > Because Pickodex is a live multiplayer game, the best way to experience it is with multiple players! To test out the live synchronization and room management by yourself:
+> 1. Open the live site in your standard browser window and create a room.
+> 2. Open an **Incognito / Private Browsing tab**, go to the live site, create a different user, and join the room using the 6-digit code.
+> 3. You can now interact with the game as two separate players in real-time!
 
-To start a local development server, run:
+## 🎮 Game Modes
 
-```bash
-ng serve
-```
+* **🎯 Prediction:** Lock in your team rankings and compete against your friends to see who comes out on top based on our custom scoring system.
+* **📈 Friend's Choice:** Can't make up your mind on what to do (e.g., where to eat, what movie to watch)? Put in your choices, have everyone rank them, and let the app calculate the group consensus!
+* **🏆 Custom:** Use both game modes to their full potential. Make your own rooms with your own choices and topics. 
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## 🚀 How to Play
 
-## Code scaffolding
+1. **Enter the Lobby:** Choose a nickname to get started. You can create a new room or join a friend's active room using a 6-digit code.
+2. **Rank Your Picks:** Use the intuitive drag-and-drop interface to move items from the "Available" pool into your "Official Ranking" list. 
+3. **Lock It In:** Once you are happy with your list, lock in your predictions.
+4. **Host Controls:** Once all players in the room have locked their picks, the Room Host can lock the room to reveal everyone's choices.
+5. **The Reveal:** For *Prediction* mode, the host sets the official real-world results, and the app calculates the leaderboard. For *Friend's Choice*, the app immediately reveals the highest-averaged winner!
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## 💻 Tech Stack
 
-```bash
-ng generate component component-name
-```
+**Frontend:**
+* **Angular:** Component-driven UI and service-oriented architecture.
+* **TypeScript & RxJS:** For managing asynchronous API calls, state, and complex prediction workflows.
+* **Angular CDK:** Powering the smooth, mobile-friendly drag-and-drop ranking boards.
+* **HTML/SCSS:** Custom styling with a modern, glassmorphism-inspired UI.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+**Backend:**
+* **Java & Spring Boot:** Robust RESTful API handling room management, game states, and scoring logic.
+* **PostgreSQL (Supabase):** Secure and reliable database for persistent user sessions and room data.
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## 🔗 Links
+* **Live Site:** [Insert Live Link Here]
+* **Backend Repository:** [Insert Backend Repo Link Here]
